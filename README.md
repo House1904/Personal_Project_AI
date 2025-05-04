@@ -82,7 +82,7 @@ Người giải sẽ lấy cấu hình ban đầu của câu đố và cố gắ
 
 ```
 git clone https://github.com/House1904/Personal_Project_AI.git
-cd <Personal_Project_AI>
+cd Personal_Project_AI
 ```
 
 **2. Cài đặt thư viện cần thiết**
@@ -97,7 +97,7 @@ python main.py
 
 Sử dụng giao diện để:
 
-- Nhập trạng thái ban đầu và trạng thái mục tiêu trong main.py
+- Nhập trạng thái ban đầu và trạng thái mục tiêu trong main.py (Đã có sẵn, bạn có thể sửa đổi tuỳ theo input của mình)
 
 ```
 start_state = [[2, 6, 5], [0, 8, 7], [4, 3, 1]] # Trạng thái ban đầu
