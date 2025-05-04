@@ -53,7 +53,7 @@ algo_label_font = pygame.font.Font(None, 25)
 cell_size = 60
 gap = 5
 
-# Ma trận dữ liệu
+# Nhập ma trận dữ liệu
 start_state = [[2, 6, 5], [0, 8, 7], [4, 3, 1]]
 goal_state = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
 current_state = copy.deepcopy(start_state)
