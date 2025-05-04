@@ -122,7 +122,7 @@ goal_state = [[1, 2, 3], [4, 5, 6], [7, 8, 0]] # Trạng thái mục tiêu
 
 ## **Giấy phép và Bản quyền**
 
-Dự án này được cấp phép theo giấy phép MIT License.
+Dự án này được cấp phép theo giấy phép [MIT License](LICENSE).
 
 Bạn có thể sử dụng, sửa đổi và phân phối phần mềm này cho bất kỳ mục đích cá nhân hoặc thương mại nào, miễn là bạn giữ nguyên thông tin bản quyền và điều khoản giấy phép gốc.
 
