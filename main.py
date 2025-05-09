@@ -1,5 +1,6 @@
 import pygame
 import copy
+import random
 from search_algorithms import (
     bfs_solve,
     dfs_solve,
@@ -19,6 +20,7 @@ from search_algorithms import (
     belief_a_star_solve,
     belief_greedy_solve,
     backtracking_solve,
+    forward_checking_solve,
 )
 
 # Khởi tạo pygame
@@ -54,9 +56,26 @@ cell_size = 60
 gap = 5
 
 # Nhập ma trận dữ liệu
-start_state = [[2, 6, 5], [0, 8, 7], [4, 3, 1]]
+start_state = [[4, 1, 0], [2, 6, 3], [7, 5, 8]]  # start_state mặc định
 goal_state = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
 current_state = copy.deepcopy(start_state)
+
+# Input box nhập start_state từ bàn phím
+input_active = False
+input_text = ""
+input_rect = pygame.Rect(600, 550, 240, 35)
+input_color_active = pygame.Color("dodgerblue2")
+input_color_inactive = pygame.Color("gray70")
+input_color = input_color_inactive
+
+
+def parse_input_to_matrix(text):
+    if len(text) == 9 and all(ch in "012345678" for ch in text):
+        if len(set(text)) == 9:  # Không trùng số
+            nums = [int(ch) for ch in text]
+            return [nums[i : i + 3] for i in range(0, 9, 3)]
+    return None
+
 
 # Vị trí ma trận
 start_pos = (100, 120)
@@ -143,6 +162,7 @@ algorithms = [
     "B-A Star",
     "B-Greedy",
     "BackTrack",
+    "ForCheck",
 ]
 
 button_width, button_height = 120, 40
@@ -240,7 +260,35 @@ def draw_interface(state_override=None):
         )
         screen.blit(algo_label, (20, 665))  # Vị trí góc trên bên trái
 
+    # Ô nhập liệu
+    pygame.draw.rect(screen, input_color, input_rect, 2)
+    if input_text == "" and not input_active:
+        # Hiển thị placeholder nếu ô rỗng và chưa được chọn
+        placeholder = small_font.render(
+            "Enter 9 digits (0-8) for Start", True, (150, 150, 150)
+        )
+        screen.blit(placeholder, (input_rect.x + 5, input_rect.y + 5))
+    else:
+        # Hiển thị nội dung người dùng nhập
+        input_surface = button_font.render(input_text, True, BLACK)
+        screen.blit(input_surface, (input_rect.x + 5, input_rect.y + 5))
+
     pygame.display.update()
+
+
+def generate_random_belief(start_state):
+    flat = sum(start_state, [])  # chuyển 2D -> 1D
+    start2_flat = flat.copy()
+
+    # Trộn cho tới khi khác với start1
+    while True:
+        random.shuffle(start2_flat)
+        if start2_flat != flat:
+            break
+
+    # Chuyển về ma trận 3x3
+    start2 = [start2_flat[i : i + 3] for i in range(0, 9, 3)]
+    return start2
 
 
 # Vòng lặp chính
@@ -248,6 +296,30 @@ running = True
 while running:
     draw_interface()
     for event in pygame.event.get():
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if input_rect.collidepoint(event.pos):
+                input_active = True
+                input_color = input_color_active
+            else:
+                input_active = False
+                input_color = input_color_inactive
+        if event.type == pygame.KEYDOWN and input_active:
+            if event.key == pygame.K_RETURN:
+                matrix = parse_input_to_matrix(input_text)
+                if matrix:
+                    start_state[:] = matrix
+                    current_state[:] = matrix
+                    solution_steps.clear()
+                    step_index = 0
+                    print("New Start State:", start_state)
+                else:
+                    print("Invalid input! Must be 9 digits 0-8 (no duplicates)")
+                input_text = ""
+            elif event.key == pygame.K_BACKSPACE:
+                input_text = input_text[:-1]
+            elif event.unicode.isdigit() and len(input_text) < 9:
+                input_text += event.unicode
+
         if event.type == pygame.QUIT:
             running = False
 
@@ -335,11 +407,7 @@ while running:
                     elif label == "B-BFS":
                         # Khởi tạo Belief với 2 trạng thái khác nhau (giả lập không chắc chắn)
                         start1 = copy.deepcopy(start_state)
-                        start2 = copy.deepcopy(start_state)
-                        start2[0][0], start2[0][1] = (
-                            start2[0][1],
-                            start2[0][0],
-                        )  # hoán đổi 2 ô đầu để khác nhau
+                        start2 = generate_random_belief(start1)
 
                         solution, runtime_duration, nodes_expanded, steps_count = (
                             belief_bfs_solve([start1, start2], goal_state)
@@ -348,11 +416,7 @@ while running:
                     elif label == "B-A Star":
                         # Khởi tạo Belief với 2 trạng thái khác nhau (giả lập không chắc chắn)
                         start1 = copy.deepcopy(start_state)
-                        start2 = copy.deepcopy(start_state)
-                        start2[0][0], start2[0][1] = (
-                            start2[0][1],
-                            start2[0][0],
-                        )  # hoán đổi 2 ô đầu để khác nhau
+                        start2 = generate_random_belief(start1)
                         solution, runtime_duration, nodes_expanded, steps_count = (
                             belief_a_star_solve([start1, start2], goal_state)
                         )
@@ -361,11 +425,7 @@ while running:
                     elif label == "B-Greedy":
                         # Khởi tạo Belief với 2 trạng thái khác nhau (giả lập không chắc chắn)
                         start1 = copy.deepcopy(start_state)
-                        start2 = copy.deepcopy(start_state)
-                        start2[0][0], start2[0][1] = (
-                            start2[0][1],
-                            start2[0][0],
-                        )  # hoán đổi 2 ô đầu để khác nhau
+                        start2 = generate_random_belief(start1)
                         solution, runtime_duration, nodes_expanded, steps_count = (
                             belief_greedy_solve([start1, start2], goal_state)
                         )
@@ -375,6 +435,12 @@ while running:
                             backtracking_solve(start_state, goal_state)
                         )
                         current_algo_name = label
+                    elif label == "ForCheck":
+                        solution, runtime_duration, nodes_expanded, steps_count = (
+                            forward_checking_solve(start_state, goal_state)
+                        )
+                        current_algo_name = label
+
                     else:
                         continue
 
@@ -395,9 +461,16 @@ while running:
                             print("No solution found!")
                             no_solution_message = True
                             solution_found_message = False
+                    elif start_state == goal_state:
+                        solution = [start_state]
+                        start_animation(solution)
+                        no_solution_message = False
+                        solution_found_message = True
+                        print("Already at goal!")
                     else:
                         print("No solution found!")
                         no_solution_message = True
+                        solution_found_message = False
 
             # Xử lý nút Control StepByStep
             for x, y, label in control_buttons:

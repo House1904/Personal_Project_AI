@@ -12,6 +12,40 @@ Người giải sẽ lấy cấu hình ban đầu của câu đố và cố gắ
 
 ---
 
+## **Mục tiêu**
+
+Mục tiêu của dự án là xây dựng một hệ thống giải bài toán 8-Puzzle bằng các thuật toán Tìm kiếm trong Trí tuệ nhân tạo (AI Search Algorithms). Hệ thống cho phép:
+
+- Tìm lời giải hợp lệ từ trạng thái ban đầu đến trạng thái mục tiêu.
+
+- So sánh hiệu quả của nhiều thuật toán dựa trên các tiêu chí như:
+
+  - Thời gian chạy (Runtime)
+
+  - Số lượng node được mở rộng (Nodes Expanded)
+
+  - Độ sâu lời giải (Search Depth)
+
+  - Số bước trong lời giải (Steps)
+
+---
+
+## **Nội dung**
+
+Dự án mô phỏng trò chơi 8-Puzzle – một bài toán sắp xếp trên lưới 3x3 với một ô trống (0). Mục tiêu là đưa các số từ 1 đến 8 về đúng thứ tự (mặc định là [[1, 2, 3], [4, 5, 6], [7, 8, 0]]) bằng cách di chuyển ô trống.
+
+Dự án bao gồm:
+
+- Giao diện đồ họa bằng Pygame: trực quan hóa trạng thái bắt đầu, trạng thái đích, và quá trình giải theo từng bước.
+
+- Lựa chọn nhiều thuật toán khác nhau từ Uninformed Search, Informed Search, Local Search, Genetic, And-Or Graph Searc, Belief-based Search và cuối cùng là CSP Search.
+
+- Cơ chế điều khiển và hiển thị kết quả chi tiết sau mỗi lần giải.
+
+- Hỗ trợ nhập trạng thái ban đầu (start state) trực tiếp từ giao diện.
+
+---
+
 ## **Các thuật toán tìm kiếm AI được triển khai**
 
 ### **Uninformed Search Algorithms:**
@@ -52,11 +86,15 @@ Người giải sẽ lấy cấu hình ban đầu của câu đố và cố gắ
 
 - **Belief-BFS**: Tìm kiếm theo chiều rộng trong môi trường niềm tin.
 
-- **Belief-DFS**: Tìm kiếm theo chiều sâu trong môi trường niềm tin.
+- **Belief-A\***: Tìm kiếm theo chiều sâu trong môi trường niềm tin.
 
 - **Belief-Greedy**: Tìm kiếm dựa trên heuristics trong môi trường niềm tin.
 
-### **Backtracking Algorithm**
+### **CSP Algorithms:**
+
+- **Backtracking Algorithm**
+
+- **Forward Checking Algorithm**
 
 ---
 
@@ -97,16 +135,25 @@ python main.py
 
 Sử dụng giao diện để:
 
-- Nhập trạng thái ban đầu và trạng thái mục tiêu trong main.py (Đã có sẵn, bạn có thể sửa đổi tuỳ theo input của mình)
+- Nhập trạng thái bắt đầu (Đã có sẵn hoặc bạn có thể nhập tuỳ theo input của mình)
 
-```
-start_state = [[2, 6, 5], [0, 8, 7], [4, 3, 1]] # Trạng thái ban đầu
-goal_state = [[1, 2, 3], [4, 5, 6], [7, 8, 0]] # Trạng thái mục tiêu
-```
+![Input](assets/Input_Start_state.png)
+
+Chú ý nhập đúng định dạng:
+
+- 0: Trống
+
+- Còn lại : Số thứ tự của ô (từ 1 đến 8)
+
+Ví dụ: 410263758
+
+Nhập xong thì nhấn Enter để áp dụng Input mới của bạn.
 
 - Chọn thuật toán mong muốn (BFS, DFS, A\*, v.v.)
 
-- Quan sát quá trình giải và so sánh kết quả (thời gian, bước đi, số node mở rộng)
+- Quan sát quá trình giải và so sánh bằng bảng kết quả.
+
+Ngoài ra, ma trận chi tiết từng bước sẽ in ra console để bạn dễ dàng theo dõi (không in ra giao diện vì quá nhiều).
 
 **5. Quan sát kết quả và chọn tiếp thuật toán khác**
 
@@ -125,6 +172,10 @@ goal_state = [[1, 2, 3], [4, 5, 6], [7, 8, 0]] # Trạng thái mục tiêu
 Dự án này được cấp phép theo giấy phép [MIT License](LICENSE).
 
 Bạn có thể sử dụng, sửa đổi và phân phối phần mềm này cho bất kỳ mục đích cá nhân hoặc thương mại nào, miễn là bạn giữ nguyên thông tin bản quyền và điều khoản giấy phép gốc.
+
+---
+
+## Các nguồn tham khảo
 
 ---
 

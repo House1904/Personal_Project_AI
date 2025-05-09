@@ -232,32 +232,6 @@ def greedy_solve(start, goal):
     return [], 0, 0, 0
 
 
-# Hàm lấy các trạng thái hàng xóm của ô trống
-def get_neighbors(state):
-    moves = []
-    empty_x, empty_y = None, None
-
-    for i in range(3):
-        for j in range(3):
-            if state[i][j] == 0:
-                empty_x, empty_y = i, j
-                break
-
-    directions = [(-1, 0, "Up"), (1, 0, "Down"), (0, -1, "Left"), (0, 1, "Right")]
-
-    for dx, dy, move in directions:
-        new_x, new_y = empty_x + dx, empty_y + dy
-        if 0 <= new_x < 3 and 0 <= new_y < 3:
-            new_state = [row[:] for row in state]
-            new_state[empty_x][empty_y], new_state[new_x][new_y] = (
-                new_state[new_x][new_y],
-                new_state[empty_x][empty_y],
-            )
-            moves.append((move, new_state))
-
-    return moves
-
-
 # Hàm tìm kiếm IDA* (Iterative Deepening A*)
 def ida_star_solve(start, goal):
     start_time = time.time()
@@ -274,12 +248,7 @@ def ida_star_solve(start, goal):
         min_cost = float("inf")
         x, y = find_blank(state)
 
-        for dx, dy in [
-            (-1, 0),
-            (1, 0),
-            (0, -1),
-            (0, 1),
-        ]:
+        for dx, dy in moves:
             nx, ny = x + dx, y + dy
             if 0 <= nx < 3 and 0 <= ny < 3:
                 new_state = copy.deepcopy(state)
@@ -324,6 +293,21 @@ def ida_star_solve(start, goal):
         threshold = cost
 
 
+# Hàm lấy các trạng thái hàng xóm hợp lệ của ô trống trong ma trận 3x3
+def get_neighbors(state):
+    neighbors = []
+    x, y = find_blank(state)  # Tận dụng lại hàm đã có
+
+    for dx, dy in moves:  # moves đã định nghĩa sẵn
+        nx, ny = x + dx, y + dy
+        if 0 <= nx < 3 and 0 <= ny < 3:
+            new_state = [row[:] for row in state]  # Deep copy từng dòng
+            new_state[x][y], new_state[nx][ny] = new_state[nx][ny], new_state[x][y]
+            neighbors.append((dx, dy, new_state))  # Nếu cần hướng thì trả về dx, dy
+
+    return neighbors
+
+
 # Thuật toán Simple Hill Climbing - Tìm kiếm đồi đơn giản
 def simple_hill_climbing(start, goal):
     start_time = time.time()
@@ -336,7 +320,7 @@ def simple_hill_climbing(start, goal):
         best_neighbor = None
         best_h = heuristic(state, goal)
 
-        for move, neighbor in neighbors:
+        for _, _, neighbor in neighbors:  # unpack 3 phần tử
             h = heuristic(neighbor, goal)
             nodes_expanded += 1
             if h < best_h:
@@ -364,7 +348,7 @@ def steepest_ascent_hill_climbing(start, goal):
         best_neighbor = state
         best_h = heuristic(state, goal)
 
-        for move, neighbor in neighbors:
+        for _, _, neighbor in neighbors:
             h = heuristic(neighbor, goal)
             nodes_expanded += 1
             if h < best_h:
@@ -390,8 +374,8 @@ def stochastic_hill_climbing(start, goal):
     while state != goal:
         neighbors = get_neighbors(state)
         better_neighbors = [
-            (move, neighbor)
-            for move, neighbor in neighbors
+            (_, _, neighbor)
+            for (_, _, neighbor) in neighbors
             if heuristic(neighbor, goal) < heuristic(state, goal)
         ]
         nodes_expanded += len(neighbors)
@@ -399,7 +383,7 @@ def stochastic_hill_climbing(start, goal):
         if not better_neighbors:
             return path, round(time.time() - start_time, 4), nodes_expanded, len(path)
 
-        move, state = random.choice(better_neighbors)
+        _, _, state = random.choice(better_neighbors)
         path.append(state)
 
     return path, round(time.time() - start_time, 4), nodes_expanded, len(path)
@@ -414,7 +398,9 @@ def beam_search_solve(start, goal, beam_width=7):  # Độ rộng của chùm s�
     nodes_expanded = 0
 
     while frontier:
-        frontier.sort(key=lambda x: x[0])
+        frontier.sort(
+            key=lambda x: x[0]
+        )  # Ưu tiên trạng thái tốt hơn (heuristic nhỏ hơn)
         next_frontier = []
 
         for _, state, path in frontier[:beam_width]:
@@ -426,23 +412,15 @@ def beam_search_solve(start, goal, beam_width=7):  # Độ rộng của chùm s�
                     len(path),
                 )
 
-            x, y = find_blank(state)
-            for dx, dy in moves:
-                nx, ny = x + dx, y + dy
-                if 0 <= nx < 3 and 0 <= ny < 3:
-                    new_state = copy.deepcopy(state)
-                    new_state[x][y], new_state[nx][ny] = (
-                        new_state[nx][ny],
-                        new_state[x][y],
-                    )
-                    state_tuple = tuple(map(tuple, new_state))
+            for _, _, new_state in get_neighbors(state):
+                state_tuple = tuple(map(tuple, new_state))
 
-                    if state_tuple not in visited:
-                        visited.add(state_tuple)
-                        nodes_expanded += 1
-                        next_frontier.append(
-                            (heuristic(new_state, goal), new_state, path + [new_state])
-                        )
+                if state_tuple not in visited:
+                    visited.add(state_tuple)
+                    nodes_expanded += 1
+                    next_frontier.append(
+                        (heuristic(new_state, goal), new_state, path + [new_state])
+                    )
 
         frontier = next_frontier
 
@@ -467,7 +445,7 @@ def simulated_annealing_solve(
         if not neighbors:
             break
 
-        _, next_state = random.choice(neighbors)
+        _, _, next_state = random.choice(neighbors)
         delta_e = heuristic(current, goal) - heuristic(next_state, goal)
         nodes_expanded += 1
 
@@ -497,34 +475,29 @@ def genetic_algorithm_solve(
     restart_limit=3,
 ):
     start_time = time.time()
-
-    moves_name = ["Up", "Down", "Left", "Right"]
-    move_dict = {"Up": (-1, 0), "Down": (1, 0), "Left": (0, -1), "Right": (0, 1)}
-
-    def apply_moves(state, moves_sequence):
-        current = copy.deepcopy(state)
-        for move in moves_sequence:
-            x, y = find_blank(current)
-            dx, dy = move_dict[move]
-            nx, ny = x + dx, y + dy
-            if 0 <= nx < 3 and 0 <= ny < 3:
-                current[x][y], current[nx][ny] = current[nx][ny], current[x][y]
-        return current
-
-    def fitness(moves_sequence):
-        result_state = apply_moves(start, moves_sequence)
-        return heuristic(result_state, goal)
-
     nodes_expanded = 0
     attempts = 0
 
     while attempts < restart_limit:
         population = [
-            [random.choice(moves_name) for _ in range(sequence_length)]
+            [random.choice(moves) for _ in range(sequence_length)]
             for _ in range(population_size)
         ]
 
-        for generation in range(generations):
+        def apply_moves(state, move_sequence):
+            current = copy.deepcopy(state)
+            for dx, dy in move_sequence:
+                x, y = find_blank(current)
+                nx, ny = x + dx, y + dy
+                if 0 <= nx < 3 and 0 <= ny < 3:
+                    current[x][y], current[nx][ny] = current[nx][ny], current[x][y]
+            return current
+
+        def fitness(move_sequence):
+            result_state = apply_moves(start, move_sequence)
+            return heuristic(result_state, goal)
+
+        for _ in range(generations):
             population.sort(key=lambda individual: fitness(individual))
             nodes_expanded += len(population)
 
@@ -533,9 +506,8 @@ def genetic_algorithm_solve(
                 runtime = round(time.time() - start_time, 4)
                 path = [start]
                 current = copy.deepcopy(start)
-                for move in best_individual:
+                for dx, dy in best_individual:
                     x, y = find_blank(current)
-                    dx, dy = move_dict[move]
                     nx, ny = x + dx, y + dy
                     if 0 <= nx < 3 and 0 <= ny < 3:
                         current[x][y], current[nx][ny] = current[nx][ny], current[x][y]
@@ -545,9 +517,9 @@ def genetic_algorithm_solve(
                 return path, runtime, nodes_expanded, len(path)
 
             survivors = population[: population_size // 2]
-            elites = population[:elitism_size]  # giữ nguyên cá thể tốt nhất
-
+            elites = population[:elitism_size]
             children = elites.copy()
+
             while len(children) < population_size:
                 parent1 = random.choice(survivors)
                 parent2 = random.choice(survivors)
@@ -555,10 +527,10 @@ def genetic_algorithm_solve(
                 child = parent1[:split] + parent2[split:]
                 children.append(child)
 
-            for individual in children[elitism_size:]:  # không đột biến cá thể elite
+            for individual in children[elitism_size:]:
                 if random.random() < mutation_rate:
                     idx = random.randint(0, sequence_length - 1)
-                    individual[idx] = random.choice(moves_name)
+                    individual[idx] = random.choice(moves)
 
             population = children
 
@@ -584,7 +556,7 @@ def and_or_graph_search(start, goal, max_depth=50):
         visited.add(tuple(map(tuple, state)))
         nodes_expanded += 1
 
-        for _, next_state in get_neighbors(state):
+        for _, _, next_state in get_neighbors(state):  # unpack 3 phần tử
             result = and_search(next_state, path + [state], visited.copy(), depth + 1)
             if result:
                 return [state] + result
@@ -608,7 +580,7 @@ def and_or_graph_search(start, goal, max_depth=50):
 # Lớp môi trường niềm tin (Belief State) - để quản lý trạng thái niềm tin
 class BeliefState:
     def __init__(self, states):
-        self.states = states
+        self.states = states  # Danh sách các trạng thái có thể xảy ra
 
     def is_goal(self, goal):
         return all(s == goal for s in self.states)
@@ -616,9 +588,9 @@ class BeliefState:
     def apply_action(self, action_fn):
         next_states = set()
         for s in self.states:
-            neighbors = action_fn(s)
-            for _, ns in neighbors:
-                next_states.add(tuple(map(tuple, ns)))
+            neighbors = action_fn(s)  # [(dx, dy, new_state), ...]
+            for _, _, ns in neighbors:  # Chỉ lấy new_state
+                next_states.add(tuple(map(tuple, ns)))  # Dùng tuple để loại trùng
         return BeliefState([list([list(row) for row in s]) for s in next_states])
 
 
@@ -652,9 +624,8 @@ def belief_bfs_solve(start_states, goal):
     return [], 0, nodes_expanded, 0
 
 
-# Thuật toán DFS cho trạng thái niềm tin
+# Thuật toán A-Star cho trạng thái niềm tin
 def belief_a_star_solve(start_states, goal):
-
     start_time = time.time()
     nodes_expanded = 0
 
@@ -724,7 +695,7 @@ def belief_greedy_solve(start_states, goal):
 
 
 # Thuật toán Backtracking - Tìm kiếm quay lui
-def backtracking_solve(start, goal, max_depth=100):
+def backtracking_solve(start, goal, max_depth=25):
     start_time = time.time()
     visited = set()
     solution = []
@@ -735,7 +706,7 @@ def backtracking_solve(start, goal, max_depth=100):
         if state == goal:
             solution = path[:]
             return True
-        if depth > max_depth:
+        if depth >= max_depth:
             return False
 
         state_tuple = tuple(map(tuple, state))
@@ -753,9 +724,56 @@ def backtracking_solve(start, goal, max_depth=100):
                     if backtrack(new_state, path + [new_state], depth + 1):
                         return True
 
+        visited.remove(state_tuple)
         return False
 
     found = backtrack(start, [start], 0)
+    runtime = round(time.time() - start_time, 4)
+    return (
+        (solution, runtime, nodes_expanded, len(solution)) if found else ([], 0, 0, 0)
+    )
+
+
+# Thuật toán Forward Checking - Tìm kiếm kiểm tra tiến
+def forward_checking_solve(start, goal, max_depth=25):
+    start_time = time.time()
+    visited = set()
+    solution = []
+    nodes_expanded = 0
+
+    def is_consistent(state):
+        # Kiểm tra AllDifferent
+        flat = sum(state, [])
+        return len(set(flat)) == 9
+
+    def forward_check(state, path, depth):
+        nonlocal solution, nodes_expanded
+        if state == goal:
+            solution = path[:]
+            return True
+        if depth > max_depth:
+            return False
+
+        state_tuple = tuple(map(tuple, state))
+        visited.add(state_tuple)
+        nodes_expanded += 1
+
+        for dx, dy in moves:
+            x, y = find_blank(state)
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < 3 and 0 <= ny < 3:
+                new_state = copy.deepcopy(state)
+                new_state[x][y], new_state[nx][ny] = new_state[nx][ny], new_state[x][y]
+                new_tuple = tuple(map(tuple, new_state))
+
+                if new_tuple not in visited and is_consistent(new_state):
+                    if forward_check(new_state, path + [new_state], depth + 1):
+                        return True
+
+        visited.remove(state_tuple)
+        return False
+
+    found = forward_check(start, [start], 0)
     runtime = round(time.time() - start_time, 4)
     return (
         (solution, runtime, nodes_expanded, len(solution)) if found else ([], 0, 0, 0)
