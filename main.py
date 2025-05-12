@@ -56,7 +56,7 @@ cell_size = 60
 gap = 5
 
 # Nhập ma trận dữ liệu
-start_state = [[4, 1, 0], [2, 6, 3], [7, 5, 8]]  # start_state mặc định
+start_state = [[2, 6, 5], [0, 8, 7], [4, 3, 1]]  # start_state mặc định
 goal_state = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
 current_state = copy.deepcopy(start_state)
 

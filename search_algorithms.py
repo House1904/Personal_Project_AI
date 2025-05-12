@@ -577,33 +577,61 @@ def and_or_graph_search(start, goal, max_depth=50):
         return [], 0, nodes_expanded, 0
 
 
-# Lớp môi trường niềm tin (Belief State) - để quản lý trạng thái niềm tin
+# Lớp môi trường niềm tin
 class BeliefState:
     def __init__(self, states):
         self.states = states  # Danh sách các trạng thái có thể xảy ra
 
     def is_goal(self, goal):
+        # Tất cả trạng thái trong belief đạt goal là thành công
         return all(s == goal for s in self.states)
 
     def apply_action(self, action_fn):
         next_states = set()
         for s in self.states:
             neighbors = action_fn(s)  # [(dx, dy, new_state), ...]
-            for _, _, ns in neighbors:  # Chỉ lấy new_state
-                next_states.add(tuple(map(tuple, ns)))  # Dùng tuple để loại trùng
+            for _, _, ns in neighbors:
+                next_states.add(tuple(map(tuple, ns)))  # dùng tuple để loại trùng
+        # Trả lại belief mới (danh sách ma trận)
         return BeliefState([list([list(row) for row in s]) for s in next_states])
 
 
-# Thuật toán BFS cho trạng thái niềm tin
-def belief_bfs_solve(start_states, goal):
+# Hàm phụ để hiển thị các trạng thái niềm tin đại diện
+def print_sample_beliefs(belief, max_display=50):
+    print(f"\nBelief Size: {len(belief.states)}")
+    for idx, state in enumerate(belief.states[:max_display]):
+        print(f"State {idx + 1}:")
+        for row in state:
+            print(row)
+        print()
+
+
+# Thuật toán BFS trong môi trường niềm tin
+def belief_bfs_solve(start_states, goal, max_depth=30):
+    print("Start State:")
+    for row in start_states[0]:
+        print(row)
+
+    print("\nInitial Belief States:")
+    for idx, state in enumerate(start_states):
+        print(f"Belief State {idx + 1}:")
+        for row in state:
+            print(row)
+        print()
+
     start_time = time.time()
     initial_belief = BeliefState(start_states)
     queue = deque([(initial_belief, [])])
     visited = set()
     nodes_expanded = 0
+    last_belief = initial_belief  # lưu lại trạng thái cuối cùng để debug
 
     while queue:
         belief, path = queue.popleft()
+        if len(path) > max_depth:
+            continue  # Bỏ qua nếu quá sâu
+
+        # Chuẩn hóa để kiểm tra visited
         belief_key = tuple(sorted(tuple(map(tuple, s)) for s in belief.states))
         if belief_key in visited:
             continue
@@ -611,6 +639,8 @@ def belief_bfs_solve(start_states, goal):
         nodes_expanded += 1
 
         if belief.is_goal(goal):
+            print("\nGoal found in belief!")
+            print_sample_beliefs(belief)
             return (
                 path + [belief.states[0]],
                 round(time.time() - start_time, 4),
@@ -620,12 +650,27 @@ def belief_bfs_solve(start_states, goal):
 
         new_belief = belief.apply_action(get_neighbors)
         queue.append((new_belief, path + [belief.states[0]]))
+        last_belief = new_belief
 
+    # Không tìm được lời giải
+    print("\nGoal NOT found in belief.")
+    print_sample_beliefs(last_belief)
     return [], 0, nodes_expanded, 0
 
 
-# Thuật toán A-Star cho trạng thái niềm tin
+#  Thuật toán A* cho môi trường niềm tin
 def belief_a_star_solve(start_states, goal):
+    print("Start State:")
+    for row in start_states[0]:
+        print(row)
+
+    print("\nInitial Belief States:")
+    for idx, state in enumerate(start_states):
+        print(f"Belief State {idx + 1}:")
+        for row in state:
+            print(row)
+        print()
+
     start_time = time.time()
     nodes_expanded = 0
 
@@ -635,6 +680,7 @@ def belief_a_star_solve(start_states, goal):
     initial_belief = BeliefState(start_states)
     heap = [(belief_heuristic(initial_belief), 0, initial_belief, [])]
     visited = set()
+    last_belief = initial_belief
 
     while heap:
         _, g, belief, path = heapq.heappop(heap)
@@ -645,6 +691,8 @@ def belief_a_star_solve(start_states, goal):
         nodes_expanded += 1
 
         if belief.is_goal(goal):
+            print("\nGoal reached in belief!")
+            print_sample_beliefs(belief)
             return (
                 path + [belief.states[0]],
                 round(time.time() - start_time, 4),
@@ -655,12 +703,26 @@ def belief_a_star_solve(start_states, goal):
         next_belief = belief.apply_action(get_neighbors)
         f = g + 1 + belief_heuristic(next_belief)
         heapq.heappush(heap, (f, g + 1, next_belief, path + [belief.states[0]]))
+        last_belief = next_belief
 
+    print("\nGoal NOT found. Last Belief State:")
+    print_sample_beliefs(last_belief)
     return [], 0, nodes_expanded, 0
 
 
-# Thuật toán Greedy Best-First Search cho trạng thái niềm tin
+# Thuật toán Greedy Best-First Search cho môi trường niềm tin
 def belief_greedy_solve(start_states, goal):
+    print("Start State:")
+    for row in start_states[0]:
+        print(row)
+
+    print("\nInitial Belief States:")
+    for idx, state in enumerate(start_states):
+        print(f"Belief State {idx + 1}:")
+        for row in state:
+            print(row)
+        print()
+
     start_time = time.time()
     nodes_expanded = 0
 
@@ -670,6 +732,7 @@ def belief_greedy_solve(start_states, goal):
     initial_belief = BeliefState(start_states)
     heap = [(belief_heuristic(initial_belief), initial_belief, [])]
     visited = set()
+    last_belief = initial_belief
 
     while heap:
         _, belief, path = heapq.heappop(heap)
@@ -680,6 +743,8 @@ def belief_greedy_solve(start_states, goal):
         nodes_expanded += 1
 
         if belief.is_goal(goal):
+            print("\nGoal reached in belief!")
+            print_sample_beliefs(belief)
             return (
                 path + [belief.states[0]],
                 round(time.time() - start_time, 4),
@@ -690,7 +755,10 @@ def belief_greedy_solve(start_states, goal):
         next_belief = belief.apply_action(get_neighbors)
         h = belief_heuristic(next_belief)
         heapq.heappush(heap, (h, next_belief, path + [belief.states[0]]))
+        last_belief = next_belief
 
+    print("\nGoal NOT found. Last Belief State:")
+    print_sample_beliefs(last_belief)
     return [], 0, nodes_expanded, 0
 
 

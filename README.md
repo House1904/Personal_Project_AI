@@ -64,7 +64,7 @@ Dự án bao gồm:
 
 - **A\* Search**: Tìm kiếm có chi phí và heuristics.
 
-- **IDA\* Search**: Tìm kiếm sâu dần và có chi phí.
+- **IDA\* Search**: Tìm kiếm sâu dần và có chi phí tương tự A\*.
 
 ### **Local Search Algorithms:**
 
@@ -82,6 +82,8 @@ Dự án bao gồm:
 
 ### **And-Or Graph Search Algorithm**
 
+Thuật toán được dùng trong môi trường có cấu trúc phân nhánh kiểu "AND" và "OR". Mỗi nút OR đại diện cho lựa chọn giữa các hành động, còn nút AND đại diện cho các hành động bắt buộc thực hiện đồng thời. Thuật toán này phù hợp với các bài toán có mục tiêu phụ thuộc nhiều điều kiện, ví dụ như trong môi trường phân rã nhiệm vụ (task decomposition) hoặc điều khiển hệ thống trong môi trường không chắc chắn.
+
 ### **Belief Propagation Algorithms:**
 
 - **Belief-BFS**: Tìm kiếm theo chiều rộng trong môi trường niềm tin.
@@ -92,9 +94,9 @@ Dự án bao gồm:
 
 ### **CSP Algorithms:**
 
-- **Backtracking Algorithm**
+- **Backtracking Algorithm**: Giải bài toán bằng cách thử từng giá trị cho biến theo thứ tự, kiểm tra ràng buộc sau mỗi bước. Nếu phát hiện xung đột, thuật toán quay lui (backtrack) để thử giá trị khác.
 
-- **Forward Checking Algorithm**
+- **Forward Checking Algorithm**: Mở rộng thuật toán backtracking bằng cách, sau mỗi lần gán biến, loại bỏ các giá trị không hợp lệ khỏi miền giá trị của các biến còn lại. Điều này giúp phát hiện sớm mâu thuẫn và giảm đáng kể không gian tìm kiếm.
 
 ---
 
@@ -177,7 +179,15 @@ Bạn có thể sử dụng, sửa đổi và phân phối phần mềm này cho
 
 ## Các nguồn tham khảo
 
----
+[8-Puzzle Solver Web App - by AbdElRahman Osama](https://8-puzzle.streamlit.app/)
+
+[eight-puzzle-solver - by Elzawawy](https://github.com/Elzawawy/eight-puzzle-solver)
+
+[8-Puzzle-Solver - by yousefkotp](https://github.com/yousefkotp/8-Puzzle-Solver)
+
+[8-puzzle-solver - by dgurkaynak](https://github.com/dgurkaynak/8-puzzle-solver?tab=readme-ov-file)
+
+## [pynpuzzle - by mahdavipanah](https://github.com/mahdavipanah/pynpuzzle)
 
 ## **Tác giả**
 
