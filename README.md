@@ -187,7 +187,7 @@ Bạn có thể sử dụng, sửa đổi và phân phối phần mềm này cho
 
 [8-puzzle-solver - by dgurkaynak](https://github.com/dgurkaynak/8-puzzle-solver?tab=readme-ov-file)
 
-## [pynpuzzle - by mahdavipanah](https://github.com/mahdavipanah/pynpuzzle)
+[pynpuzzle - by mahdavipanah](https://github.com/mahdavipanah/pynpuzzle)
 
 ## **Tác giả**
 
