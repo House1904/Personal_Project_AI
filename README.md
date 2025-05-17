@@ -6,15 +6,23 @@
 
 ## **Mô tả về dự án**
 
+<div style="text-align: justify;">
+
 Dự án này triển khai giải pháp cho bài toán 8-Puzzle cổ điển bằng nhiều thuật toán tìm kiếm AI khác nhau. 8-Puzzle là trò chơi giải đố trượt, trong đó mục tiêu là sắp xếp lại các ô để tạo thành một chuỗi đã sắp xếp. Trò chơi được biểu diễn dưới dạng lưới 3x3, thiếu một ô (được biểu diễn bằng một khoảng trống).
 
 Người giải sẽ lấy cấu hình ban đầu của câu đố và cố gắng đạt đến trạng thái mục tiêu (thường là: `1 2 3 4 5 6 7 8 0`, trong đó `0` là ô trống) bằng cách áp dụng nhiều chiến lược tìm kiếm khác nhau. Dự án bao gồm giao diện đồ họa để trực quan hóa từng bước của quá trình giải và bảng kết quả để so sánh hiệu suất của các thuật toán.
+
+</div>
 
 ---
 
 ## **Mục tiêu**
 
+<div style="text-align: justify;">
+
 Mục tiêu của dự án là xây dựng một hệ thống giải bài toán 8-Puzzle bằng các thuật toán Tìm kiếm trong Trí tuệ nhân tạo (AI Search Algorithms). Hệ thống cho phép:
+
+</div>
 
 - Tìm lời giải hợp lệ từ trạng thái ban đầu đến trạng thái mục tiêu.
 
@@ -38,7 +46,7 @@ Dự án bao gồm:
 
 - Giao diện đồ họa bằng Pygame: trực quan hóa trạng thái bắt đầu, trạng thái đích, và quá trình giải theo từng bước.
 
-- Lựa chọn nhiều thuật toán khác nhau từ Uninformed Search, Informed Search, Local Search, Genetic, And-Or Graph Searc, Belief-based Search và cuối cùng là CSP Search.
+- Lựa chọn nhiều thuật toán khác nhau từ Uninformed Search, Informed Search, Local Search, Genetic, And-Or Graph Search, Belief-based Search và cuối cùng là CSP Search.
 
 - Cơ chế điều khiển và hiển thị kết quả chi tiết sau mỗi lần giải.
 
@@ -82,7 +90,11 @@ Dự án bao gồm:
 
 ### **And-Or Graph Search Algorithm**
 
+<div style="text-align: justify;">
+
 Thuật toán được dùng trong môi trường có cấu trúc phân nhánh kiểu "AND" và "OR". Mỗi nút OR đại diện cho lựa chọn giữa các hành động, còn nút AND đại diện cho các hành động bắt buộc thực hiện đồng thời. Thuật toán này phù hợp với các bài toán có mục tiêu phụ thuộc nhiều điều kiện, ví dụ như trong môi trường phân rã nhiệm vụ (task decomposition) hoặc điều khiển hệ thống trong môi trường không chắc chắn.
+
+</div>
 
 ### **Belief Propagation Algorithms:**
 
@@ -94,9 +106,13 @@ Thuật toán được dùng trong môi trường có cấu trúc phân nhánh k
 
 ### **CSP Algorithms:**
 
+<div style="text-align: justify;">
+
 - **Backtracking Algorithm**: Giải bài toán bằng cách thử từng giá trị cho biến theo thứ tự, kiểm tra ràng buộc sau mỗi bước. Nếu phát hiện xung đột, thuật toán quay lui (backtrack) để thử giá trị khác.
 
 - **Forward Checking Algorithm**: Mở rộng thuật toán backtracking bằng cách, sau mỗi lần gán biến, loại bỏ các giá trị không hợp lệ khỏi miền giá trị của các biến còn lại. Điều này giúp phát hiện sớm mâu thuẫn và giảm đáng kể không gian tìm kiếm.
+
+</div>
 
 ---
 
@@ -126,6 +142,16 @@ cd Personal_Project_AI
 ```
 
 **2. Cài đặt thư viện cần thiết**
+
+- pygame
+
+- random
+
+- heapq
+
+- queue
+
+- math...
 
 **3. Chạy chương trình**
 
