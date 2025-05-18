@@ -341,7 +341,7 @@ Tóm lại, Genetic Algorithm là phương pháp mạnh mẽ cho các bài toán
 
 - SHC, S-AHC, StoHC (Hill Climbing): Chạy cực nhanh, nhưng dễ rơi vào local optimum (vùng kẹt). Độ sâu nhỏ → không tìm được lời giải cho các map khó.
 
-### 4.4. Searh Algorithms in Complex Environment
+### 4.4. Search Algorithms in Complex Environment
 
 Trong các môi trường phức tạp, chẳng hạn như môi trường không chắc chắn, môi trường với niềm tin (belief), hoặc môi trường có giới hạn thông tin, việc tìm kiếm lời giải không thể chỉ dựa vào trạng thái đầu đầy đủ. Thay vào đó, các thuật toán cần xử lý thêm yếu tố như:
 
