@@ -88,7 +88,7 @@ Thuật toán sử dụng một hàng đợi (queue) để lưu các trạng th�
 
 Khi tìm được trạng thái đích, thuật toán trả về bốn thông tin: đường đi từ đầu đến đích, thời gian thực thi, số trạng thái đã mở rộng, và độ dài lời giải. BFS đảm bảo tìm được lời giải ngắn nhất nếu tồn tại, nhưng có thể tốn nhiều bộ nhớ và thời gian khi không gian trạng thái quá lớn.
 
-![BFS_gif](assets/Algorithms_Gif/1_BFS.gif)
+![BFS_gif](assets/Algorithm_Gifs/1_BFS.gif)
 
 #### 4.1.2. DFS (Depth-First Search) - Tìm kiếm theo chiều sâu,
 
@@ -102,7 +102,7 @@ Nếu chưa đạt tới trạng thái đích và chưa vượt quá độ sâu 
 
 Thuật toán trả về bốn thông tin chính: đường đi lời giải, thời gian thực thi, số lượng trạng thái đã mở rộng, và độ dài lời giải. DFS có ưu điểm là tiết kiệm bộ nhớ hơn BFS, nhưng không đảm bảo tìm được lời giải ngắn nhất và có thể bị kẹt trong nhánh sai nếu không giới hạn độ sâu.
 
-![DFS_gif](assets/Algorithms_Gif/2_DFS.gif)
+![DFS_gif](assets/Algorithm_Gifs/2_DFS.gif)
 
 #### 4.1.3. UCS (Uniform Cost Search) - Tìm kiếm có chi phí,
 
@@ -116,7 +116,7 @@ Từ trạng thái hiện tại, thuật toán tìm vị trí ô trống (0) và
 
 UCS đảm bảo tìm được lời giải có chi phí thấp nhất (nếu tồn tại), và thường có hiệu quả tương đương với BFS trong các bài toán mà mỗi bước đi có cùng chi phí. Tuy nhiên, UCS có thể tốn nhiều thời gian và bộ nhớ nếu không gian trạng thái quá lớn.
 
-![UCS_gif](assets/Algorithms_Gif/3_UCS.gif)
+![UCS_gif](assets/Algorithm_Gifs/3_UCS.gif)
 
 #### 4.1.4. IDS (Iterative Deepening Search) - Tìm kiếm sâu dần.
 
@@ -130,11 +130,11 @@ IDS sử dụng một tập visited để tránh lặp trạng thái trong mỗi
 
 Thuật toán trả về: đường đi từ start đến goal, thời gian chạy, số lượng trạng thái đã mở rộng và độ dài lời giải. IDS có hiệu suất bộ nhớ tốt (do dùng DFS ở từng vòng lặp) và vẫn đảm bảo tìm được lời giải tối ưu nếu chi phí mỗi bước là như nhau.
 
-![IDS_gif](assets/Algorithms_Gif/4_IDS.gif)
+![IDS_gif](assets/Algorithm_Gifs/4_IDS.gif)
 
 #### Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm không có thông tin:
 
-![Compare_Uninform_Search](assets/Compares_Chart/Uninform_Search.png)
+![Compare_Uninform_Search](assets/Compare_Charts/1.%20Uninform_Search.png)
 
 #### Nhận xét chung về hiệu suất thuật toán tìm kiếm không thông tin:
 
@@ -164,7 +164,7 @@ Trong 8-Puzzle, hàm heuristic là tổng khoảng cách Manhattan giữa vị t
 
 Tóm lại, Greedy Best-First Search thích hợp với các bài toán cần tốc độ và có hướng dẫn rõ ràng, nhưng không lý tưởng khi yêu cầu giải pháp tối ưu.
 
-![Greedy_gif](assets/Algorithms_Gif/5_Greedy.gif)
+![Greedy_gif](assets/Algorithm_Gifs/5_Greedy.gif)
 
 #### 4.2.2. A\* Search - Tìm kiếm có chi phí và heuristics,
 
@@ -186,7 +186,7 @@ Trong 8-Puzzle, heuristic được dùng là tổng khoảng cách Manhattan gi�
 
 Tóm lại, A\* là một trong những thuật toán tìm kiếm mạnh mẽ nhất trong AI, phù hợp khi cần lời giải ngắn nhất và có thể thiết kế heuristic hợp lý.
 
-![AStar_gif](assets/Algorithms_Gif/6_AStar.gif)
+![AStar_gif](assets/Algorithm_Gifs/6_AStar.gif)
 
 #### 4.2.3. IDA\* Search - Tìm kiếm sâu dần và có chi phí tương tự A\*,
 
@@ -200,7 +200,7 @@ Quá trình tiếp tục như vậy cho đến khi tìm thấy trạng thái đ�
 
 Tóm lại, IDA* phù hợp cho các bài toán có không gian trạng thái lớn nhưng vẫn cần đảm bảo tìm lời giải tối ưu với mức sử dụng bộ nhớ hợp lý. Đây là phiên bản tối ưu hóa theo chiều sâu của A*.
 
-![IDAStar_gif](assets/Algorithms_Gif/7_IDAStar.gif)
+![IDAStar_gif](assets/Algorithm_Gifs/7_IDAStar.gif)
 
 #### 4.2.4. Beam Search: Tìm kiếm bằng cách chọn các giải pháp tốt nhất trong một số lượng giới hạn.
 
@@ -214,11 +214,11 @@ Trong 8-Puzzle, Beam Search sử dụng khoảng cách Manhattan làm heuristic.
 
 Tóm lại, Beam Search là sự cân bằng giữa hiệu quả và chi phí, phù hợp với các bài toán lớn cần giới hạn tài nguyên, nhưng cần chọn beam_width hợp lý để tránh bỏ sót lời giải.
 
-![Beam_gif](assets/Algorithms_Gif/8_Beam.gif)
+![Beam_gif](assets/Algorithm_Gifs/8_Beam.gif)
 
 #### Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm có thông tin:
 
-![Compare_Inform_Search](assets/Compares_Chart/Inform_Search.png)
+![Compare_Inform_Search](assets/Compare_Charts/2.%20Inform_Search.png)
 
 #### Nhận xét chung về hiệu suất thuật toán tìm kiếm có thông tin:
 
@@ -262,7 +262,7 @@ Trong 8-Puzzle, thuật toán dùng khoảng cách Manhattan để đánh giá �
 
 Tóm lại, Simple Hill Climbing phù hợp với các bài toán nhỏ hoặc có bề mặt tìm kiếm "trơn tru", nhưng không phù hợp với bài toán có nhiều đỉnh giả hoặc bẫy cục bộ.
 
-![SHC_gif](assets/Algorithms_Gif/9_SHC.gif)
+![SHC_gif](assets/Algorithm_Gifs/9_SHC.gif)
 
 #### 4.3.2. Steepest Ascent Hill Climbing - Tìm kiếm bằng cách di chuyển đến vị trí tốt nhất,
 
@@ -276,7 +276,7 @@ Trong 8-Puzzle, tiêu chí đánh giá vẫn là tổng khoảng cách Manhattan
 
 Tóm lại, Steepest Ascent Hill Climbing thường hiệu quả hơn phiên bản đơn giản, nhưng vẫn không đảm bảo tìm được lời giải tối ưu. Thường cần cải tiến thêm (như random restart hoặc simulated annealing) để tránh kẹt.
 
-![S-AHC_gif](assets/Algorithms_Gif/10_S-AHC.gif)
+![S-AHC_gif](assets/Algorithm_Gifs/10_S-AHC.gif)
 
 #### 4.3.3. Stochastic Hill Climbing - Tìm kiếm bằng cách di chuyển đến vị trí tốt hơn với xác suất,
 
@@ -291,7 +291,7 @@ Nhược điểm: vẫn không đảm bảo đến được trạng thái đích
 
 Tóm lại, Stochastic Hill Climbing là một phương pháp tìm kiếm nhẹ và dễ cài đặt, thích hợp để thử nhanh trên các bài toán có nhiều điểm kẹt nhỏ, nhưng không nên dùng nếu cần sự ổn định và chắc chắn.
 
-![StoHC_gif](assets/Algorithms_Gif/11_StoHC.gif)
+![StoHC_gif](assets/Algorithm_Gifs/11_StoHC.gif)
 
 #### 4.3.4. Simulated Annealing - Tìm kiếm bằng cách di chuyển đến vị trí tốt hơn với xác suất giảm dần,
 
@@ -305,7 +305,7 @@ Nhiệt độ (temperature) sẽ giảm dần theo hệ số cooling_rate sau m�
 
 Tóm lại, Simulated Annealing là một giải pháp hiệu quả cho các bài toán tối ưu phức tạp, có nhiều đỉnh cục bộ, nhưng cần điều chỉnh tham số cẩn thận để đạt hiệu quả tốt.
 
-![SA_gif](assets/Algorithms_Gif/12_SA.gif)
+![SA_gif](assets/Algorithm_Gifs/12_SA.gif)
 
 #### 4.3.5. Genetic Algorithm: Tìm kiếm bằng cách di chuyển đến vị trí tốt hơn thông qua quá trình chọn lọc và lai ghép.
 
@@ -327,11 +327,11 @@ Nếu một cá thể đưa ra trạng thái khớp với goal, thuật toán k�
 
 Tóm lại, Genetic Algorithm là phương pháp mạnh mẽ cho các bài toán tìm kiếm phức tạp, nhưng cần tinh chỉnh kỹ lưỡng để đạt hiệu quả cao.
 
-![Gen_gif](assets/Algorithms_Gif/13_Gen_2.gif)
+![Gen_gif](assets/Algorithm_Gifs/13_Gen_2.gif)
 
 #### Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm cục bộ:
 
-![Compare_Local_Search](assets/Compares_Chart/Local_Search.png)
+![Compare_Local_Search](assets/Compare_Charts/3.%20Local_Search.png)
 
 #### Nhận xét chung về hiệu suất thuật toán tìm kiếm cục bộ:
 
@@ -373,7 +373,7 @@ Thuật toán hoạt động giống DFS có giới hạn độ sâu (max_depth)
 
 Tóm lại, And-Or Graph Search phù hợp cho các bài toán như lập kế hoạch nhiều bước, giải quyết tình huống bất định, hoặc bài toán phân rã mục tiêu, nhưng trong 8-Puzzle, nó chủ yếu mang tính mô phỏng và minh họa lý thuyết.
 
-![AndOr_gif](assets/Algorithms_Gif/14_And-Or.gif)
+![AndOr_gif](assets/Algorithm_Gifs/14_And-Or.gif)
 
 #### 4.4.2. Belief State Search Algorithms:
 
@@ -381,27 +381,27 @@ Trong môi trường không chắc chắn, đầu vào không phải là một t
 
 - **Belief-BFS**: Áp dụng BFS cho từng trạng thái hoàn chỉnh được sinh ra từ trạng thái niềm tin. Duyệt theo chiều rộng với độ sâu tăng dần.
 
-![B-BFS_gif](assets/Algorithms_Gif/15_B-BFS.gif)
+![B-BFS_gif](assets/Algorithm_Gifs/15_B-BFS.gif)
 
 - **Belief-IDS**: Duyệt các trạng thái hoàn chỉnh theo chiều sâu tăng dần. Với mỗi độ sâu, duyệt toàn bộ các nhánh trước khi tăng giới hạn.
 
-![B-IDS_gif](assets/Algorithms_Gif/16_B-IDS.gif)
+![B-IDS_gif](assets/Algorithm_Gifs/16_B-IDS.gif)
 
 - **Belief-A\***: Mỗi trạng thái sinh ra sẽ được đánh giá theo tổng chi phí: f(n) = g(n) + h(n). Trong đó g(n) là chi phí từ đầu đến trạng thái hiện tại, h(n) là heuristic (tổng khoảng cách Manhattan).
 
-![B-AStar_gif](assets/Algorithms_Gif/17_B-AStar.gif)
+![B-AStar_gif](assets/Algorithm_Gifs/17_B-AStar.gif)
 
 - **Belief-Greedy**: Chỉ sử dụng heuristic h(n) để đánh giá, không tính chi phí đã đi. Tập trung vào trạng thái có vẻ gần đích nhất.
 
-![B-Greedy_gif](assets/Algorithms_Gif/18_B-Greedy.gif)
+![B-Greedy_gif](assets/Algorithm_Gifs/18_B-Greedy.gif)
 
 - **Belief-Beam**: Tìm kiếm theo chiều rộng nhưng giới hạn số lượng trạng thái được giữ lại mỗi vòng (beam width).
 
-![B-Beam_gif](assets/Algorithms_Gif/19_B-Beam.gif)
+![B-Beam_gif](assets/Algorithm_Gifs/19_B-Beam.gif)
 
 #### Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm trong môi trường phức tạp:
 
-![Compare_Complex_Search](assets/Compares_Chart/Complex_Search.png)
+![Compare_Complex_Search](assets/Compare_Charts/4.%20Complex_Search.png)
 
 #### Nhận xét chung về hiệu suất thuật toán tìm kiếm trong môi trường phức tạp:
 
@@ -419,17 +419,17 @@ Trong môi trường không chắc chắn, đầu vào không phải là một t
 
 Giải bài toán bằng cách thử từng giá trị cho biến theo thứ tự, kiểm tra ràng buộc sau mỗi bước. Nếu phát hiện xung đột, thuật toán quay lui (backtrack) để thử giá trị khác.
 
-![BackTrack_gif](assets/Algorithms_Gif/20_BackTrack.gif)
+![BackTrack_gif](assets/Algorithm_Gifs/20_BackTrack.gif)
 
 ### 4.5.2. Forward Checking Algorithm
 
 Mở rộng thuật toán backtracking bằng cách, sau mỗi lần gán biến, loại bỏ các giá trị không hợp lệ khỏi miền giá trị của các biến còn lại. Điều này giúp phát hiện sớm mâu thuẫn và giảm đáng kể không gian tìm kiếm.
 
-![ForCheck_gif](assets/Algorithms_Gif/21_ForCheck.gif)
+![ForCheck_gif](assets/Algorithm_Gifs/21_ForCheck.gif)
 
 #### Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm trong môi trường ràng buộc:
 
-![Compare_CSP](assets/Compares_Chart/CSP_Search.png)
+![Compare_CSP](assets/Compare_Charts/5.%20CSP_Search.png)
 
 #### Nhận xét chung về hiệu suất thuật toán tìm kiếm trong môi trường ràng buộc:
 
@@ -455,7 +455,7 @@ Q-Learning học một hàm giá trị Q(state, action) – đại diện cho l�
 
 - Epsilon (ε): tỷ lệ khám phá – xác suất chọn hành động ngẫu nhiên để khám phá
 
-![Q-Learning_gif](assets/Algorithms_Gif/22_Q-Learning.gif)
+![Q-Learning_gif](assets/Algorithm_Gifs/22_Q-Learning.gif)
 
 ---
 
