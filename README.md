@@ -2,7 +2,7 @@
 
 ## Tác giả:
 
-- **Lê Vũ Hào**
+- **Lê Vũ Hào** (https://github.com/House1904/Personal_Project_AI?tab=readme-ov-file)
 
 - **MSSV:** 23133020
 
