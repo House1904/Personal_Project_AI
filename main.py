@@ -1,6 +1,7 @@
 import pygame
 import copy
 import random
+import numpy as np
 from search_algorithms import (
     bfs_solve,
     dfs_solve,
@@ -9,19 +10,55 @@ from search_algorithms import (
     a_star_solve,
     greedy_solve,
     ida_star_solve,
+    beam_search_solve,
     simple_hill_climbing,
     steepest_ascent_hill_climbing,
     stochastic_hill_climbing,
-    beam_search_solve,
     simulated_annealing_solve,
     genetic_algorithm_solve,
     and_or_graph_search,
     belief_bfs_solve,
+    belief_ids_solve,
     belief_a_star_solve,
     belief_greedy_solve,
+    belief_beam_solve,
     backtracking_solve,
     forward_checking_solve,
+    q_learning_solve,
 )
+
+import matplotlib.pyplot as plt
+
+results_log = {}
+
+import csv
+import os
+
+
+def log_result_to_csv(start_state_str, algorithm_name, runtime, nodes, depth):
+    filename = "algorithm_results_log.csv"
+    file_exists = os.path.isfile(filename)
+
+    with open(filename, mode="a", newline="") as file:
+        writer = csv.writer(file)
+        if not file_exists:
+            writer.writerow(
+                [
+                    "Start State",
+                    "Algorithm",
+                    "Runtime",
+                    "Nodes Expanded",
+                    "Search Depth",
+                ]
+            )
+        writer.writerow([start_state_str, algorithm_name, runtime, nodes, depth])
+
+
+def flatten_matrix(matrix):
+    return "".join(
+        str(cell) if cell is not None else "-" for row in matrix for cell in row
+    )
+
 
 # Khởi tạo pygame
 pygame.init()
@@ -77,6 +114,31 @@ def parse_input_to_matrix(text):
     return None
 
 
+def parse_input_to_belief_matrix(text):
+    if len(text) != 9:
+        return None  # Không đủ 9 ký tự
+
+    nums = []
+    seen = set()
+
+    for ch in text:
+        if ch == "-":
+            nums.append(None)
+        elif ch.isdigit():
+            val = int(ch)
+            if val in seen:
+                return None  # Bị trùng số
+            seen.add(val)
+            nums.append(val)
+        else:
+            return None  # Ký tự không hợp lệ
+
+    if len(seen) + nums.count(None) != 9:
+        return None  # Thiếu hoặc dư số
+
+    return [nums[i : i + 3] for i in range(0, 9, 3)]
+
+
 # Vị trí ma trận
 start_pos = (100, 120)
 step_pos = (350, 120)
@@ -95,6 +157,7 @@ is_playing = False
 no_solution_message = False
 solution_found_message = False
 current_algo_name = ""
+belief_matrix = None
 
 
 # Hàm in ra kết quả
@@ -151,22 +214,25 @@ algorithms = [
     "Greedy",
     "A Star",
     "IDA Star",
+    "Beam",
     "SHC",
     "S-AHC",
     "StoHC",
-    "Beam",
     "SA",
     "Gen",
     "And-Or",
     "B-BFS",
+    "B-IDS",
     "B-A Star",
     "B-Greedy",
+    "B-Beam",
     "BackTrack",
     "ForCheck",
+    "Q-Learn",
 ]
 
 button_width, button_height = 120, 40
-button_width_control, button_height_control = 135, 40
+button_width_control, button_height_control = 125, 40
 button_padding = 5
 start_x = 100
 
@@ -176,31 +242,44 @@ buttons_row1 = [
 ]
 buttons_row2 = [
     (start_x + i * (button_width + button_padding), 450, algo)
-    for i, algo in enumerate(algorithms[4:7])
+    for i, algo in enumerate(algorithms[4:8])
 ]
 buttons_row3 = [
     (start_x + i * (button_width + button_padding), 500, algo)
-    for i, algo in enumerate(algorithms[7:10])
+    for i, algo in enumerate(algorithms[8:11])
 ]
 buttons_row4 = [
     (start_x + i * (button_width + button_padding), 550, algo)
-    for i, algo in enumerate(algorithms[10:13])
+    for i, algo in enumerate(algorithms[11:13])
 ]
 
 buttons_row5 = [
     (start_x + i * (button_width + button_padding), 600, algo)
-    for i, algo in enumerate(algorithms[13:])
+    for i, algo in enumerate(algorithms[13:19])
 ]
 
-buttons = buttons_row1 + buttons_row2 + buttons_row3 + buttons_row4 + buttons_row5
+buttons_row6 = [
+    (start_x + i * (button_width + button_padding), 650, algo)
+    for i, algo in enumerate(algorithms[19:])
+]
+
+buttons = (
+    buttons_row1
+    + buttons_row2
+    + buttons_row3
+    + buttons_row4
+    + buttons_row5
+    + buttons_row6
+)
 
 # Các nút điều khiển StepByStep
 control_buttons = [
-    (100, 330, "Previous"),
-    (250, 330, "Stop"),
-    (400, 330, "Next"),
-    (550, 330, "Play"),
-    (700, 330, "Reset"),
+    (15, 330, "Previous"),
+    (165, 330, "Stop"),
+    (315, 330, "Next"),
+    (465, 330, "Play"),
+    (615, 330, "Reset"),
+    (765, 330, "Compare"),
 ]
 
 
@@ -258,7 +337,7 @@ def draw_interface(state_override=None):
         algo_label = algo_label_font.render(
             f"Algorithm running: {current_algo_name}", True, BLACK
         )
-        screen.blit(algo_label, (20, 665))  # Vị trí góc trên bên trái
+        screen.blit(algo_label, (650, 665))  # Vị trí góc trên bên trái
 
     # Ô nhập liệu
     pygame.draw.rect(screen, input_color, input_rect, 2)
@@ -276,21 +355,6 @@ def draw_interface(state_override=None):
     pygame.display.update()
 
 
-def generate_random_belief(start_state):
-    flat = sum(start_state, [])  # chuyển 2D -> 1D
-    start2_flat = flat.copy()
-
-    # Trộn cho tới khi khác với start1
-    while True:
-        random.shuffle(start2_flat)
-        if start2_flat != flat:
-            break
-
-    # Chuyển về ma trận 3x3
-    start2 = [start2_flat[i : i + 3] for i in range(0, 9, 3)]
-    return start2
-
-
 # Vòng lặp chính
 running = True
 while running:
@@ -305,20 +369,32 @@ while running:
                 input_color = input_color_inactive
         if event.type == pygame.KEYDOWN and input_active:
             if event.key == pygame.K_RETURN:
-                matrix = parse_input_to_matrix(input_text)
-                if matrix:
-                    start_state[:] = matrix
-                    current_state[:] = matrix
-                    solution_steps.clear()
-                    step_index = 0
-                    print("New Start State:", start_state)
-                else:
-                    print("Invalid input! Must be 9 digits 0-8 (no duplicates)")
+                if "-" in input_text:  # Nếu là belief input
+                    belief_matrix = parse_input_to_belief_matrix(input_text)
+                    if belief_matrix:
+                        print("New Belief Input:", belief_matrix)
+                        # Không cập nhật start_state ở đây
+                    else:
+                        print(
+                            "Invalid belief input. Use format like '2-6--870-' with no duplicates."
+                        )
+                        belief_matrix = None  # Reset nếu sai
+                else:  # Nếu là input đầy đủ
+                    matrix = parse_input_to_matrix(input_text)
+                    if matrix:
+                        start_state[:] = matrix
+                        current_state[:] = matrix
+                        solution_steps.clear()
+                        step_index = 0
+                        print("New Start State:", start_state)
+                    else:
+                        print("Invalid input! Must be 9 digits 0-8 (no duplicates)")
                 input_text = ""
             elif event.key == pygame.K_BACKSPACE:
                 input_text = input_text[:-1]
-            elif event.unicode.isdigit() and len(input_text) < 9:
-                input_text += event.unicode
+            elif len(input_text) < 9:
+                if event.unicode in "012345678-":
+                    input_text += event.unicode
 
         if event.type == pygame.QUIT:
             running = False
@@ -339,108 +415,441 @@ while running:
                             bfs_solve(start_state, goal_state)
                         )
                         current_algo_name = label  # Lưu tên thuật toán hiện tại
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(start_state),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
                     elif label == "DFS":
                         solution, runtime_duration, nodes_expanded, steps_count = (
                             dfs_solve(start_state, goal_state)
                         )
                         current_algo_name = label  # Lưu tên thuật toán hiện tại
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(start_state),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
                     elif label == "UCS":
                         solution, runtime_duration, nodes_expanded, steps_count = (
                             ucs_solve(start_state, goal_state)
                         )
                         current_algo_name = label  # Lưu tên thuật toán hiện tại
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(start_state),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
                     elif label == "IDS":
                         solution, runtime_duration, nodes_expanded, steps_count = (
                             ids_solve(start_state, goal_state)
                         )
                         current_algo_name = label  # Lưu tên thuật toán hiện tại
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(start_state),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
                     elif label == "A Star":
                         solution, runtime_duration, nodes_expanded, steps_count = (
                             a_star_solve(start_state, goal_state)
                         )
                         current_algo_name = label  # Lưu tên thuật toán hiện tại
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(start_state),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
                     elif label == "Greedy":
                         solution, runtime_duration, nodes_expanded, steps_count = (
                             greedy_solve(start_state, goal_state)
                         )
                         current_algo_name = label  # Lưu tên thuật toán hiện tại
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(start_state),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
                     elif label == "IDA Star":
                         solution, runtime_duration, nodes_expanded, steps_count = (
                             ida_star_solve(start_state, goal_state)
                         )
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(start_state),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
                         current_algo_name = label  # Lưu tên thuật toán hiện tại
                     elif label == "SHC":
                         solution, runtime_duration, nodes_expanded, steps_count = (
                             simple_hill_climbing(start_state, goal_state)
                         )
                         current_algo_name = label  # Lưu tên thuật toán hiện tại
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(start_state),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
                     elif label == "S-AHC":
                         solution, runtime_duration, nodes_expanded, steps_count = (
                             steepest_ascent_hill_climbing(start_state, goal_state)
                         )
                         current_algo_name = label  # Lưu tên thuật toán hiện tại
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(start_state),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
                     elif label == "StoHC":
                         solution, runtime_duration, nodes_expanded, steps_count = (
                             stochastic_hill_climbing(start_state, goal_state)
                         )
                         current_algo_name = label  # Lưu tên thuật toán hiện tại
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(start_state),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
                     elif label == "Beam":
                         solution, runtime_duration, nodes_expanded, steps_count = (
                             beam_search_solve(start_state, goal_state)
                         )
                         current_algo_name = label  # Lưu tên thuật toán hiện tại
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(start_state),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
                     elif label == "SA":
                         solution, runtime_duration, nodes_expanded, steps_count = (
                             simulated_annealing_solve(start_state, goal_state)
                         )
                         current_algo_name = label  # Lưu tên thuật toán hiện tại
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(start_state),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
                     elif label == "Gen":
                         solution, runtime_duration, nodes_expanded, steps_count = (
                             genetic_algorithm_solve(start_state, goal_state)
                         )
                         current_algo_name = label  # Lưu tên thuật toán hiện tại
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(start_state),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
                     elif label == "And-Or":
                         solution, runtime_duration, nodes_expanded, steps_count = (
                             and_or_graph_search(start_state, goal_state)
                         )
                         current_algo_name = label  # Lưu tên thuật toán hiện tại
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(start_state),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
                     elif label == "B-BFS":
-                        # Khởi tạo Belief với 2 trạng thái khác nhau (giả lập không chắc chắn)
-                        start1 = copy.deepcopy(start_state)
-                        start2 = generate_random_belief(start1)
+                        if not belief_matrix:
+                            print(
+                                "Please enter a valid belief input before running this algorithm."
+                            )
+                            no_solution_message = True
+                            solution_found_message = False
+                            continue
 
                         solution, runtime_duration, nodes_expanded, steps_count = (
-                            belief_bfs_solve([start1, start2], goal_state)
-                        )
-                        current_algo_name = label  # Lưu tên thuật toán hiện tại
-                    elif label == "B-A Star":
-                        # Khởi tạo Belief với 2 trạng thái khác nhau (giả lập không chắc chắn)
-                        start1 = copy.deepcopy(start_state)
-                        start2 = generate_random_belief(start1)
-                        solution, runtime_duration, nodes_expanded, steps_count = (
-                            belief_a_star_solve([start1, start2], goal_state)
+                            belief_bfs_solve(belief_matrix, goal_state)
                         )
                         current_algo_name = label
+
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(belief_matrix),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
+                    elif label == "B-IDS":
+                        if not belief_matrix:
+                            print(
+                                "Please enter a valid belief input before running this algorithm."
+                            )
+                            no_solution_message = True
+                            solution_found_message = False
+                            continue
+
+                        solution, runtime_duration, nodes_expanded, steps_count = (
+                            belief_ids_solve(belief_matrix, goal_state)
+                        )
+                        current_algo_name = label
+
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(belief_matrix),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
+                    elif label == "B-A Star":
+                        if not belief_matrix:
+                            print(
+                                "Please enter a valid belief input before running this algorithm."
+                            )
+                            no_solution_message = True
+                            solution_found_message = False
+                            continue
+
+                        solution, runtime_duration, nodes_expanded, steps_count = (
+                            belief_a_star_solve(belief_matrix, goal_state)
+                        )
+                        current_algo_name = label
+
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(belief_matrix),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
 
                     elif label == "B-Greedy":
-                        # Khởi tạo Belief với 2 trạng thái khác nhau (giả lập không chắc chắn)
-                        start1 = copy.deepcopy(start_state)
-                        start2 = generate_random_belief(start1)
+                        if not belief_matrix:
+                            print(
+                                "Please enter a valid belief input before running this algorithm."
+                            )
+                            no_solution_message = True
+                            solution_found_message = False
+                            continue
+
                         solution, runtime_duration, nodes_expanded, steps_count = (
-                            belief_greedy_solve([start1, start2], goal_state)
+                            belief_greedy_solve(belief_matrix, goal_state)
                         )
                         current_algo_name = label
+
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(belief_matrix),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
+                    elif label == "B-Beam":
+                        if not belief_matrix:
+                            print(
+                                "Please enter a valid belief input before running this algorithm."
+                            )
+                            no_solution_message = True
+                            solution_found_message = False
+                            continue
+
+                        solution, runtime_duration, nodes_expanded, steps_count = (
+                            belief_beam_solve(belief_matrix, goal_state)
+                        )
+                        current_algo_name = label
+
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(belief_matrix),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
                     elif label == "BackTrack":
                         solution, runtime_duration, nodes_expanded, steps_count = (
                             backtracking_solve(start_state, goal_state)
                         )
                         current_algo_name = label
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(start_state),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
+
                     elif label == "ForCheck":
                         solution, runtime_duration, nodes_expanded, steps_count = (
                             forward_checking_solve(start_state, goal_state)
                         )
                         current_algo_name = label
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(start_state),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
 
+                    elif label == "Q-Learn":
+                        solution, runtime_duration, nodes_expanded, steps_count = (
+                            q_learning_solve(start_state, goal_state)
+                        )
+                        current_algo_name = label
+                        results_log[label] = {
+                            "Runtime": runtime_duration,
+                            "Nodes Expanded": nodes_expanded,
+                            "Search Depth": steps_count,
+                        }
+                        log_result_to_csv(
+                            flatten_matrix(start_state),
+                            label,
+                            runtime_duration,
+                            nodes_expanded,
+                            steps_count,
+                        )
                     else:
                         continue
 
@@ -452,6 +861,8 @@ while running:
                     print_solution(solution)
 
                     if solution:
+                        start_state[:] = solution[0]
+                        current_state[:] = solution[0]
                         start_animation(solution)
                         if solution[-1] == goal_state:
                             no_solution_message = False
@@ -507,13 +918,81 @@ while running:
                         no_solution_message = False
                         solution_found_message = False
                         current_algo_name = ""
+                    elif label == "Compare" and results_log:
+                        # Lấy danh sách thuật toán đã chạy
+                        algorithms_ran = list(results_log.keys())
+                        x = np.arange(len(algorithms_ran))
+
+                        # Dữ liệu
+                        runtimes = [
+                            results_log[algo]["Runtime"] for algo in algorithms_ran
+                        ]
+                        nodes = [
+                            results_log[algo]["Nodes Expanded"]
+                            for algo in algorithms_ran
+                        ]
+                        depths = [
+                            results_log[algo]["Search Depth"] for algo in algorithms_ran
+                        ]
+
+                        bar_width = 0.25
+
+                        fig, ax1 = plt.subplots(figsize=(12, 6))
+
+                        # Trục thứ nhất - Runtime
+                        ax1.set_xlabel("Algorithms")
+                        ax1.set_ylabel("Runtime (s)", color="tab:blue")
+                        bars1 = ax1.bar(
+                            x - bar_width,
+                            runtimes,
+                            width=bar_width,
+                            label="Runtime",
+                            color="tab:blue",
+                        )
+                        ax1.tick_params(axis="y", labelcolor="tab:blue")
+
+                        # Trục thứ hai - Nodes Expanded
+                        ax2 = ax1.twinx()
+                        ax2.set_ylabel("Nodes Expanded", color="tab:green")
+                        bars2 = ax2.bar(
+                            x,
+                            nodes,
+                            width=bar_width,
+                            label="Nodes Expanded",
+                            color="tab:green",
+                        )
+                        ax2.tick_params(axis="y", labelcolor="tab:green")
+
+                        # Trục thứ ba - Search Depth
+                        ax3 = ax1.twinx()
+                        ax3.spines.right.set_position(
+                            ("axes", 1.15)
+                        )  # Đẩy trục thứ ba sang phải
+                        ax3.set_ylabel("Search Depth", color="tab:red")
+                        bars3 = ax3.bar(
+                            x + bar_width,
+                            depths,
+                            width=bar_width,
+                            label="Search Depth",
+                            color="tab:red",
+                        )
+                        ax3.tick_params(axis="y", labelcolor="tab:red")
+
+                        # Gán nhãn trục X
+                        ax1.set_xticks(x)
+                        ax1.set_xticklabels(algorithms_ran, rotation=45)
+
+                        # Tiêu đề và hiển thị
+                        plt.title("Comparison of Search Algorithms (Multi-axis)")
+                        fig.tight_layout()
+                        plt.show()
 
     # Nếu đang Play tự động
     if is_playing and solution_steps:
         if step_index < len(solution_steps) - 1:
             step_index += 1
             current_state = copy.deepcopy(solution_steps[step_index])
-            pygame.time.delay(300)
+            pygame.time.delay(200)
         else:
             is_playing = False
 

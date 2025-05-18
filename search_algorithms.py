@@ -4,6 +4,7 @@ from collections import deque
 import heapq
 import random
 import math
+from itertools import permutations
 
 
 # Hàm tìm vị trí của ô trống (0) trong ma trận 3x3
@@ -429,7 +430,7 @@ def beam_search_solve(start, goal, beam_width=7):  # Độ rộng của chùm s�
 
 # Thuật toán Simulated Annealing - Tìm kiếm làm mát mô phỏng
 def simulated_annealing_solve(
-    start, goal, initial_temperature=3000, cooling_rate=0.999, min_temperature=1e-5
+    start, goal, initial_temperature=1000, cooling_rate=0.95, min_temperature=1
 ):
     start_time = time.time()
     current = start
@@ -469,7 +470,7 @@ def genetic_algorithm_solve(
     goal,
     population_size=200,
     generations=1000,
-    mutation_rate=0.05,
+    mutation_rate=0.1,
     sequence_length=50,
     elitism_size=2,
     restart_limit=3,
@@ -577,189 +578,175 @@ def and_or_graph_search(start, goal, max_depth=50):
         return [], 0, nodes_expanded, 0
 
 
-# Lớp môi trường niềm tin
-class BeliefState:
-    def __init__(self, states):
-        self.states = states  # Danh sách các trạng thái có thể xảy ra
+# BFS - Belief Search - Tìm kiếm theo chiều rộng trên trạng thái tin tưởng
+def belief_bfs_solve(belief_state, goal):
+    start_time = time.time()
+    known = []
+    unknown_pos = []
 
-    def is_goal(self, goal):
-        # Tất cả trạng thái trong belief đạt goal là thành công
-        return all(s == goal for s in self.states)
+    # Tìm các vị trí đã biết và chưa biết
+    for i in range(3):
+        for j in range(3):
+            val = belief_state[i][j]
+            if val is None:
+                unknown_pos.append((i, j))
+            else:
+                known.append(val)
 
-    def apply_action(self, action_fn):
-        next_states = set()
-        for s in self.states:
-            neighbors = action_fn(s)  # [(dx, dy, new_state), ...]
-            for _, _, ns in neighbors:
-                next_states.add(tuple(map(tuple, ns)))  # dùng tuple để loại trùng
-        # Trả lại belief mới (danh sách ma trận)
-        return BeliefState([list([list(row) for row in s]) for s in next_states])
+    # Các giá trị còn thiếu (0-8 trừ đi các số đã biết)
+    missing = [x for x in range(9) if x not in known]
+
+    # Nếu không hợp lệ thì trả về
+    if len(known) + len(unknown_pos) != 9:
+        return [], 0, 0, 0
+
+    nodes_expanded_total = 0
+
+    for perm in permutations(missing):
+        filled = copy.deepcopy(belief_state)
+        for idx, (i, j) in enumerate(unknown_pos):
+            filled[i][j] = perm[idx]
+
+        # Lưu trạng thái đã được điền đầy đủ để trả về làm start
+        first_state = copy.deepcopy(filled)
+
+        result = bfs_solve(filled, goal)
+        nodes_expanded_total += result[2]
+
+        if result[0]:
+            full_path = [first_state] + result[
+                0
+            ]  # Chèn trạng thái đầu vào đầu đường đi
+            runtime = round(time.time() - start_time, 4)
+            return full_path, runtime, nodes_expanded_total, len(full_path) - 1
+
+    return [], round(time.time() - start_time, 4), nodes_expanded_total, 0
 
 
-# Hàm phụ để hiển thị các trạng thái niềm tin đại diện
-def print_sample_beliefs(belief, max_display=50):
-    print(f"\nBelief Size: {len(belief.states)}")
-    for idx, state in enumerate(belief.states[:max_display]):
-        print(f"State {idx + 1}:")
-        for row in state:
-            print(row)
-        print()
+def is_valid_state(matrix):
+    flat = sum(matrix, [])
+    return sorted(flat) == list(range(9))  # đủ 0-8, không trùng
 
 
-# Thuật toán BFS trong môi trường niềm tin
-def belief_bfs_solve(start_states, goal, max_depth=30):
-    print("Start State:")
-    for row in start_states[0]:
-        print(row)
+def generate_all_states(belief_matrix):
+    flat = sum(belief_matrix, [])
+    missing = [i for i in range(9) if i not in flat if i is not None]
+    none_indices = [i for i, v in enumerate(flat) if v is None]
 
-    print("\nInitial Belief States:")
-    for idx, state in enumerate(start_states):
-        print(f"Belief State {idx + 1}:")
-        for row in state:
-            print(row)
-        print()
+    for perm in permutations(missing):
+        new_flat = flat[:]
+        for idx, val in zip(none_indices, perm):
+            new_flat[idx] = val
+        state = [new_flat[i : i + 3] for i in range(0, 9, 3)]
+        yield state
+
+
+# IDS - Belief Search - Tìm kiếm theo chiều sâu lặp lại trên trạng thái tin tưởng
+def belief_ids_solve(belief_matrix, goal_state):
 
     start_time = time.time()
-    initial_belief = BeliefState(start_states)
-    queue = deque([(initial_belief, [])])
-    visited = set()
-    nodes_expanded = 0
-    last_belief = initial_belief  # lưu lại trạng thái cuối cùng để debug
+    total_nodes = 0
 
-    while queue:
-        belief, path = queue.popleft()
-        if len(path) > max_depth:
-            continue  # Bỏ qua nếu quá sâu
-
-        # Chuẩn hóa để kiểm tra visited
-        belief_key = tuple(sorted(tuple(map(tuple, s)) for s in belief.states))
-        if belief_key in visited:
+    for complete_state in generate_all_states(belief_matrix):
+        if not is_valid_state(complete_state):
             continue
-        visited.add(belief_key)
-        nodes_expanded += 1
 
-        if belief.is_goal(goal):
-            print("\nGoal found in belief!")
-            print_sample_beliefs(belief)
+        # Lưu lại trạng thái belief hoàn chỉnh để gắn đầu đường đi
+        first_state = copy.deepcopy(complete_state)
+
+        solution, rt, nodes, depth = ids_solve(complete_state, goal_state)
+        total_nodes += nodes
+
+        if solution:
+            full_path = [first_state] + solution  # chèn trạng thái đầu tiên
             return (
-                path + [belief.states[0]],
+                full_path,
                 round(time.time() - start_time, 4),
-                nodes_expanded,
-                len(path) + 1,
+                total_nodes,
+                len(full_path) - 1,
             )
 
-        new_belief = belief.apply_action(get_neighbors)
-        queue.append((new_belief, path + [belief.states[0]]))
-        last_belief = new_belief
-
-    # Không tìm được lời giải
-    print("\nGoal NOT found in belief.")
-    print_sample_beliefs(last_belief)
-    return [], 0, nodes_expanded, 0
+    return [], round(time.time() - start_time, 4), total_nodes, 0
 
 
-#  Thuật toán A* cho môi trường niềm tin
-def belief_a_star_solve(start_states, goal):
-    print("Start State:")
-    for row in start_states[0]:
-        print(row)
-
-    print("\nInitial Belief States:")
-    for idx, state in enumerate(start_states):
-        print(f"Belief State {idx + 1}:")
-        for row in state:
-            print(row)
-        print()
+# A* - Belief Search - Tìm kiếm A* trên trạng thái tin tưởng
+def belief_a_star_solve(belief_matrix, goal_state):
 
     start_time = time.time()
-    nodes_expanded = 0
+    nodes_total = 0
 
-    def belief_heuristic(belief):
-        return sum(heuristic(s, goal) for s in belief.states) / len(belief.states)
-
-    initial_belief = BeliefState(start_states)
-    heap = [(belief_heuristic(initial_belief), 0, initial_belief, [])]
-    visited = set()
-    last_belief = initial_belief
-
-    while heap:
-        _, g, belief, path = heapq.heappop(heap)
-        belief_key = tuple(sorted(tuple(map(tuple, s)) for s in belief.states))
-        if belief_key in visited:
+    for complete_state in generate_all_states(belief_matrix):
+        if not is_valid_state(complete_state):
             continue
-        visited.add(belief_key)
-        nodes_expanded += 1
 
-        if belief.is_goal(goal):
-            print("\nGoal reached in belief!")
-            print_sample_beliefs(belief)
+        first_state = copy.deepcopy(complete_state)
+
+        solution, rt, nodes, depth = a_star_solve(complete_state, goal_state)
+        nodes_total += nodes
+
+        if solution:
+            full_path = [first_state] + solution
             return (
-                path + [belief.states[0]],
+                full_path,
                 round(time.time() - start_time, 4),
-                nodes_expanded,
-                len(path) + 1,
+                nodes_total,
+                len(full_path) - 1,
             )
 
-        next_belief = belief.apply_action(get_neighbors)
-        f = g + 1 + belief_heuristic(next_belief)
-        heapq.heappush(heap, (f, g + 1, next_belief, path + [belief.states[0]]))
-        last_belief = next_belief
-
-    print("\nGoal NOT found. Last Belief State:")
-    print_sample_beliefs(last_belief)
-    return [], 0, nodes_expanded, 0
+    return [], round(time.time() - start_time, 4), nodes_total, 0
 
 
-# Thuật toán Greedy Best-First Search cho môi trường niềm tin
-def belief_greedy_solve(start_states, goal):
-    print("Start State:")
-    for row in start_states[0]:
-        print(row)
-
-    print("\nInitial Belief States:")
-    for idx, state in enumerate(start_states):
-        print(f"Belief State {idx + 1}:")
-        for row in state:
-            print(row)
-        print()
+# Greedy - Belief Search - Tìm kiếm Greedy trên trạng thái tin tưởng
+def belief_greedy_solve(belief_matrix, goal_state):
 
     start_time = time.time()
-    nodes_expanded = 0
+    nodes_total = 0
 
-    def belief_heuristic(belief):
-        return sum(heuristic(s, goal) for s in belief.states) / len(belief.states)
-
-    initial_belief = BeliefState(start_states)
-    heap = [(belief_heuristic(initial_belief), initial_belief, [])]
-    visited = set()
-    last_belief = initial_belief
-
-    while heap:
-        _, belief, path = heapq.heappop(heap)
-        belief_key = tuple(sorted(tuple(map(tuple, s)) for s in belief.states))
-        if belief_key in visited:
+    for complete_state in generate_all_states(belief_matrix):
+        if not is_valid_state(complete_state):
             continue
-        visited.add(belief_key)
-        nodes_expanded += 1
 
-        if belief.is_goal(goal):
-            print("\nGoal reached in belief!")
-            print_sample_beliefs(belief)
+        first_state = copy.deepcopy(complete_state)
+
+        solution, rt, nodes, depth = greedy_solve(complete_state, goal_state)
+        nodes_total += nodes
+
+        if solution:
+            full_path = [first_state] + solution
             return (
-                path + [belief.states[0]],
+                full_path,
                 round(time.time() - start_time, 4),
-                nodes_expanded,
-                len(path) + 1,
+                nodes_total,
+                len(full_path) - 1,
             )
 
-        next_belief = belief.apply_action(get_neighbors)
-        h = belief_heuristic(next_belief)
-        heapq.heappush(heap, (h, next_belief, path + [belief.states[0]]))
-        last_belief = next_belief
+    return [], round(time.time() - start_time, 4), nodes_total, 0
 
-    print("\nGoal NOT found. Last Belief State:")
-    print_sample_beliefs(last_belief)
-    return [], 0, nodes_expanded, 0
+
+# Beam - Belief Search - Tìm kiếm Beam trên trạng thái tin tưởng
+def belief_beam_solve(belief_matrix, goal_state):
+
+    start_time = time.time()
+    total_nodes = 0
+
+    for complete_state in generate_all_states(belief_matrix):
+        if not is_valid_state(complete_state):
+            continue
+
+        first_state = copy.deepcopy(complete_state)
+        solution, rt, nodes, depth = beam_search_solve(complete_state, goal_state)
+        total_nodes += nodes
+
+        if solution:
+            full_path = [first_state] + solution
+            return (
+                full_path,
+                round(time.time() - start_time, 4),
+                total_nodes,
+                len(full_path) - 1,
+            )
+
+    return [], round(time.time() - start_time, 4), total_nodes, 0
 
 
 # Thuật toán Backtracking - Tìm kiếm quay lui
@@ -846,3 +833,117 @@ def forward_checking_solve(start, goal, max_depth=25):
     return (
         (solution, runtime, nodes_expanded, len(solution)) if found else ([], 0, 0, 0)
     )
+
+
+# Thuật toán Q-Learning - Tìm kiếm học tăng cường
+def state_to_tuple(state):
+    return tuple(tuple(row) for row in state)
+
+
+def get_valid_actions_q(state_tuple):
+    state = [list(row) for row in state_tuple]
+    x, y = next((r, c) for r in range(3) for c in range(3) if state[r][c] == 0)
+    actions = []
+    if x > 0:
+        actions.append(0)  # lên
+    if x < 2:
+        actions.append(1)  # xuống
+    if y > 0:
+        actions.append(2)  # trái
+    if y < 2:
+        actions.append(3)  # phải
+    return actions
+
+
+def apply_action_q(state_tuple, action):
+    state = [list(row) for row in state_tuple]
+    x, y = next((r, c) for r in range(3) for c in range(3) if state[r][c] == 0)
+    nx, ny = x, y
+    if action == 0:
+        nx -= 1
+    elif action == 1:
+        nx += 1
+    elif action == 2:
+        ny -= 1
+    elif action == 3:
+        ny += 1
+    if not (0 <= nx < 3 and 0 <= ny < 3):
+        return state_tuple, (x, y)
+    state[x][y], state[nx][ny] = state[nx][ny], state[x][y]
+    return state_to_tuple(state), (nx, ny)
+
+
+def path_to_states(start_state, move_path):
+    current = [row[:] for row in start_state]
+    states = [copy.deepcopy(current)]
+    for move in move_path:
+        x, y = next((r, c) for r in range(3) for c in range(3) if current[r][c] == 0)
+        nx, ny = move
+        current[x][y], current[nx][ny] = current[nx][ny], current[x][y]
+        states.append(copy.deepcopy(current))
+    return states
+
+
+def q_learning_solve(
+    start,
+    goal,
+    episodes=100000,
+    alpha=0.1,
+    gamma=0.9,
+    epsilon_start=1.0,
+    max_steps=150,
+    max_path_len=150,
+):
+
+    start_time = time.time()
+    Q = {}
+    start_tuple = state_to_tuple(start)
+    goal_tuple = state_to_tuple(goal)
+
+    for episode in range(episodes):
+        state = start_tuple
+        epsilon = epsilon_start * math.exp(-episode / (episodes / 5))
+        for _ in range(max_steps):
+            actions = get_valid_actions_q(state)
+            if not actions:
+                break
+            q_vals = Q.get(state, [0.0] * 4)
+            if random.random() < epsilon:
+                action = random.choice(actions)
+            else:
+                action = max(actions, key=lambda a: q_vals[a])
+
+            next_state, _ = apply_action_q(state, action)
+            reward = 100 if next_state == goal_tuple else -1
+            max_q_next = (
+                max(Q.get(next_state, [0.0] * 4)) if next_state != goal_tuple else 0
+            )
+
+            q_vals[action] = q_vals[action] + alpha * (
+                reward + gamma * max_q_next - q_vals[action]
+            )
+            Q[state] = q_vals
+            state = next_state
+            if state == goal_tuple:
+                break
+
+    # Truy vết đường đi tốt nhất từ Q-table
+    state = start_tuple
+    path = []
+    for _ in range(max_path_len):
+        if state == goal_tuple:
+            break
+        actions = get_valid_actions_q(state)
+        if not actions:
+            break
+        q_vals = Q.get(state, [0.0] * 4)
+        action = max(actions, key=lambda a: q_vals[a])
+        next_state, next_pos = apply_action_q(state, action)
+        path.append(next_pos)
+        state = next_state
+
+    if state != goal_tuple:
+        return [], 0, 0, 0
+
+    full_path = path_to_states(start, path)
+    return full_path, round(time.time() - start_time, 4), len(Q), len(full_path)
