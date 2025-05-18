@@ -1,18 +1,20 @@
 # **🔢 8-Puzzle Solver using AI Search Algorithms**
 
-- Lê Vũ Hào
+## Tác giả:
 
-- MSSV: 23133020
+- **Lê Vũ Hào**
 
-- Trường: Đai học Sư phạm Kỹ thuật Thành phố Hồ Chí Minh
+- **MSSV:** 23133020
 
-- Môn học: Trí tuệ nhân tạo (Artificial Intelligence)
+- **Trường:** Đai học Sư phạm Kỹ thuật Thành phố Hồ Chí Minh
+
+- **Môn học:** Trí tuệ nhân tạo (Artificial Intelligence)
 
 ![Demo Giao Diện](assets/Game_GUI.png)
 
 ---
 
-## **1. Mô tả về dự án**
+## 1. Mô tả về dự án
 
 Dự án này triển khai giải pháp cho bài toán 8-Puzzle cổ điển bằng nhiều thuật toán tìm kiếm AI khác nhau. 8-Puzzle là trò chơi giải đố trượt, trong đó mục tiêu là sắp xếp lại các ô để tạo thành một chuỗi đã sắp xếp. Trò chơi được biểu diễn dưới dạng lưới 3x3, thiếu một ô (được biểu diễn bằng một khoảng trống).
 
@@ -20,7 +22,7 @@ Người giải sẽ lấy cấu hình ban đầu của câu đố và cố gắ
 
 ---
 
-## **2. Mục tiêu**
+## 2. Mục tiêu
 
 Mục tiêu của dự án là xây dựng một hệ thống giải bài toán 8-Puzzle bằng các thuật toán Tìm kiếm trong Trí tuệ nhân tạo (AI Search Algorithms). Hệ thống cho phép:
 
@@ -38,7 +40,7 @@ Mục tiêu của dự án là xây dựng một hệ thống giải bài toán 
 
 ---
 
-## **3. Nội dung**
+## 3. Nội dung
 
 Dự án mô phỏng trò chơi 8-Puzzle – một bài toán sắp xếp trên lưới 3x3 với một ô trống (0). Mục tiêu là đưa các số từ 1 đến 8 về đúng thứ tự (mặc định là [[1, 2, 3], [4, 5, 6], [7, 8, 0]]) bằng cách di chuyển ô trống.
 
@@ -46,7 +48,7 @@ Dự án mô phỏng trò chơi 8-Puzzle – một bài toán sắp xếp trên 
 
 - Giao diện đồ họa bằng Pygame: trực quan hóa trạng thái bắt đầu, trạng thái đích, và quá trình giải theo từng bước.
 
-- Lựa chọn nhiều thuật toán khác nhau từ Uninformed Search, Informed Search, Local Search, Genetic, And-Or Graph Search, Belief-based Search và cuối cùng là CSP Search.
+- Lựa chọn nhiều thuật toán khác nhau từ Uninformed Search, Informed Search, Local Search, Genetic, And-Or Graph Search, Belief-based Search, CSP Search và cuối cùng là Q-Learning.
 
 - Cơ chế các nút điều khiển để theo dõi quá trình giải và hiển thị kết quả chi tiết sau mỗi lần giải.
 
@@ -58,9 +60,9 @@ Dự án mô phỏng trò chơi 8-Puzzle – một bài toán sắp xếp trên 
 
 ---
 
-## **4. Các thuật toán tìm kiếm AI được triển khai**
+## 4. Các thuật toán tìm kiếm AI được triển khai
 
-### **4.1. Uninformed Search Algorithms**
+### 4.1. Uninformed Search Algorithms
 
 Thuật toán tìm kiếm không thông tin (Uninformed Search Algorithms), còn gọi là thuật toán tìm kiếm mù (blind search algorithms), là một lớp thuật toán không sử dụng bất kỳ kiến thức đặc thù nào về miền bài toán ngoài các thông tin được mô tả trong đề bài. Các thuật toán này sẽ không sử dụng hàm heuristic – một hàm đánh giá để ước lượng khoảng cách đến đích. Vì không có sự định hướng cụ thể, chúng khám phá không gian trạng thái một cách hệ thống, thường theo các chiến lược đơn giản như duyệt theo chiều rộng hoặc chiều sâu.
 
@@ -74,7 +76,7 @@ Thuật toán tìm kiếm không thông tin chỉ dựa trên:
 
 Nói cách khác, chúng không có thêm hiểu biết gì về bản chất của bài toán ngoài cấu trúc mô tả ban đầu.
 
-#### 4.1.1. **BFS (Breadth-First Search)** - Tìm kiếm theo chiều rộng,
+#### 4.1.1. BFS (Breadth-First Search) - Tìm kiếm theo chiều rộng,
 
 Thuật toán **BFS** (Breadth-First Search) là một chiến lược tìm kiếm không thông tin (uninformed search) thường dùng để giải bài toán 8-Puzzle. Mục tiêu là tìm dãy bước di chuyển để đưa trạng thái ban đầu của bảng 3x3 về đúng trạng thái đích đã cho.
 
@@ -88,7 +90,7 @@ Khi tìm được trạng thái đích, thuật toán trả về bốn thông ti
 
 ![BFS_gif](assets/Algorithms_Gif/1_BFS.gif)
 
-#### 4.1.2. **DFS (Depth-First Search)** - Tìm kiếm theo chiều sâu,
+#### 4.1.2. DFS (Depth-First Search) - Tìm kiếm theo chiều sâu,
 
 Thuật toán **DFS** (Depth-First Search) là một chiến lược tìm kiếm không thông tin, áp dụng để giải bài toán 8-Puzzle bằng cách ưu tiên đi sâu vào từng nhánh trạng thái trước khi quay lại xét các nhánh khác. Mục tiêu vẫn là tìm dãy bước di chuyển từ trạng thái ban đầu đến trạng thái đích thông qua hoán đổi ô trống (0) với các ô xung quanh.
 
@@ -102,7 +104,7 @@ Thuật toán trả về bốn thông tin chính: đường đi lời giải, th
 
 ![DFS_gif](assets/Algorithms_Gif/2_DFS.gif)
 
-#### 4.1.3. **UCS (Uniform Cost Search)** - Tìm kiếm có chi phí,
+#### 4.1.3. UCS (Uniform Cost Search) - Tìm kiếm có chi phí,
 
 Thuật toán **UCS** (Uniform Cost Search) là một chiến lược tìm kiếm không thông tin, sử dụng cấu trúc hàng đợi ưu tiên (priority queue) để luôn mở rộng trạng thái có tổng chi phí thấp nhất từ trạng thái ban đầu. Trong bài toán 8-Puzzle, chi phí thường được tính là số bước di chuyển từ trạng thái ban đầu đến trạng thái hiện tại.
 
@@ -116,7 +118,7 @@ UCS đảm bảo tìm được lời giải có chi phí thấp nhất (nếu t�
 
 ![UCS_gif](assets/Algorithms_Gif/3_UCS.gif)
 
-#### 4.1.4. **IDS (Iterative Deepening Search)** - Tìm kiếm sâu dần.
+#### 4.1.4. IDS (Iterative Deepening Search) - Tìm kiếm sâu dần.
 
 Thuật toán **IDS** (Iterative Deepening Search) là sự kết hợp giữa hai thuật toán tìm kiếm cổ điển: DFS (Depth-First Search) và BFS (Breadth-First Search). Mục tiêu của IDS là vừa tiết kiệm bộ nhớ như DFS, vừa đảm bảo tìm được lời giải ngắn nhất như BFS.
 
@@ -130,13 +132,21 @@ Thuật toán trả về: đường đi từ start đến goal, thời gian ch�
 
 ![IDS_gif](assets/Algorithms_Gif/4_IDS.gif)
 
-#### 4.1.5. **Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm không có thông tin:**
+#### Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm không có thông tin:
 
 ![Compare_Uninform_Search](assets/Compares_Chart/Uninform_Search.png)
 
-#### 4.1.6. **Nhận xét chung về hiệu suất thuật toán tìm kiếm không thông tin:**
+#### Nhận xét chung về hiệu suất thuật toán tìm kiếm không thông tin:
 
-### **4.2. Informed Search Algorithms**
+- BFS và UCS là lựa chọn tốt nếu ta cần giải pháp chắc chắn và tối ưu nhưng chấp nhận chi phí tính toán cao.
+
+- DFS nhanh và tiết kiệm bộ nhớ nhưng không đảm bảo chất lượng lời giải.
+
+- IDS là thuật toán thông minh hơn DFS nhưng đánh đổi bằng thời gian và số node mở rộng rất lớn, đặc biệt trong các bài toán không gian lớn.
+
+Vì vậy, với các bài toán đơn giản, DFS hoặc BFS là lựa chọn tốt. Nhưng với môi trường phức tạp hơn, nên cân nhắc sử dụng các thuật toán có thông tin (heuristic) như A\*, Greedy,... để đạt hiệu quả cao hơn.
+
+### 4.2. Informed Search Algorithms
 
 Thuật toán tìm kiếm có thông tin, hay còn gọi là thuật toán tìm kiếm theo heuristic, là một thành phần cốt lõi trong lĩnh vực Trí tuệ nhân tạo (AI). Khác với các thuật toán tìm kiếm không thông tin (blind search), các thuật toán này sử dụng kiến thức đặc thù của bài toán (domain-specific knowledge) để hướng dẫn quá trình tìm kiếm, giúp tìm lời giải nhanh hơn và hiệu quả hơn.
 
@@ -144,7 +154,7 @@ Trong bối cảnh này, heuristic là một hàm đánh giá dùng để ước
 
 Ví dụ: trong bài toán tìm đường, heuristic có thể là khoảng cách Euclidean từ điểm hiện tại đến đích.
 
-#### 4.2.1. **Greedy Best-First Search** - Tìm kiếm dựa trên heuristics,
+#### 4.2.1. Greedy Best-First Search - Tìm kiếm dựa trên heuristics,
 
 **Greedy Best-First Search** (Tìm kiếm tham lam tốt nhất) là thuật toán tìm kiếm có thông tin, dùng heuristic để dẫn hướng quá trình tìm kiếm. Mục tiêu là mở rộng trạng thái "gần mục tiêu nhất" theo đánh giá heuristic. Thuật toán sử dụng một hàng đợi ưu tiên. Mỗi trạng thái được gán điểm h(n) – là giá trị heuristic ước lượng khoảng cách còn lại đến đích. Trạng thái có h(n) nhỏ nhất sẽ được chọn mở rộng trước.
 
@@ -156,7 +166,7 @@ Tóm lại, Greedy Best-First Search thích hợp với các bài toán cần t�
 
 ![Greedy_gif](assets/Algorithms_Gif/5_Greedy.gif)
 
-#### 4.2.2. **A\* Search** - Tìm kiếm có chi phí và heuristics,
+#### 4.2.2. A\* Search - Tìm kiếm có chi phí và heuristics,
 
 **A\*** Search là một thuật toán tìm kiếm có thông tin, kết hợp giữa chi phí đã đi (g(n)) và ước lượng còn lại (h(n)) để tìm ra đường đi tối ưu đến đích.
 
@@ -178,7 +188,7 @@ Tóm lại, A\* là một trong những thuật toán tìm kiếm mạnh mẽ nh
 
 ![AStar_gif](assets/Algorithms_Gif/6_AStar.gif)
 
-#### 4.2.3. **IDA\* Search** - Tìm kiếm sâu dần và có chi phí tương tự A\*,
+#### 4.2.3. IDA\* Search - Tìm kiếm sâu dần và có chi phí tương tự A\*,
 
 **IDA\*** (Iterative Deepening A*) là thuật toán kết hợp giữa A* và tìm kiếm sâu dần (Iterative Deepening). Thuật toán sử dụng chi phí f(n) = g(n) + h(n) như A\*, nhưng thay vì dùng hàng đợi ưu tiên, nó giới hạn tìm kiếm theo từng "ngưỡng" chi phí và tăng dần.
 
@@ -192,7 +202,7 @@ Tóm lại, IDA* phù hợp cho các bài toán có không gian trạng thái l�
 
 ![IDAStar_gif](assets/Algorithms_Gif/7_IDAStar.gif)
 
-#### 4.2.4. **Beam Search**: Tìm kiếm bằng cách chọn các giải pháp tốt nhất trong một số lượng giới hạn.
+#### 4.2.4. Beam Search: Tìm kiếm bằng cách chọn các giải pháp tốt nhất trong một số lượng giới hạn.
 
 **Beam Search** là thuật toán tìm kiếm cục bộ có hướng dẫn heuristic, nhưng chỉ giữ lại một số lượng trạng thái giới hạn (beam width) tại mỗi bước mở rộng. Nó giống Greedy Search nhưng được mở rộng song song cho nhiều nhánh tiềm năng.
 
@@ -206,13 +216,23 @@ Tóm lại, Beam Search là sự cân bằng giữa hiệu quả và chi phí, p
 
 ![Beam_gif](assets/Algorithms_Gif/8_Beam.gif)
 
-#### 4.2.5. **Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm có thông tin:**
+#### Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm có thông tin:
 
 ![Compare_Inform_Search](assets/Compares_Chart/Inform_Search.png)
 
-#### 4.2.6. **Nhận xét chung về hiệu suất thuật toán tìm kiếm có thông tin:**
+#### Nhận xét chung về hiệu suất thuật toán tìm kiếm có thông tin:
 
-### **4.3. Local Search Algorithms**
+- A\* là lựa chọn hàng đầu nếu ta cần độ chính xác và hiệu quả cao.
+
+- Greedy phù hợp với bài toán nhỏ và yêu cầu tốc độ cao.
+
+- Beam Search là lựa chọn cân bằng giữa tốc độ và tài nguyên.
+
+- IDA\* ít dùng trong thực tế do chi phí thời gian lớn, dù vẫn đảm bảo tối ưu.
+
+Khi chọn thuật toán heuristic, nên ưu tiên A\* hoặc Greedy nếu heuristic dùng tốt (ví dụ: Manhattan distance với 8-Puzzle).
+
+### 4.3. Local Search Algorithms
 
 **Local Search Algorithms** (thuật toán tìm kiếm cục bộ) là các thuật toán tập trung vào việc cải thiện trạng thái hiện tại bằng cách xem xét các trạng thái lân cận (neighbor states). Thay vì tìm đường đi từ trạng thái ban đầu đến đích như các thuật toán truyền thống, local search chỉ quan tâm đến việc tối ưu hóa trạng thái.
 
@@ -226,7 +246,7 @@ Thuật toán tìm kiếm cục bộ thường được dùng khi:
 
 Local search thường không đảm bảo tìm ra lời giải tối ưu toàn cục, nhưng chạy nhanh, đơn giản, và hiệu quả với bài toán lớn. Đây là nền tảng quan trọng trong các hệ thống AI thực tiễn như: lập thời khóa biểu, điều phối xe, giải sudoku,...
 
-#### 4.3.1. **Simple Hill Climbing** - Tìm kiếm bằng cách di chuyển đến vị trí tốt hơn,
+#### 4.3.1. Simple Hill Climbing - Tìm kiếm bằng cách di chuyển đến vị trí tốt hơn,
 
 **Simple Hill Climbing** là thuật toán tìm kiếm cục bộ hoạt động bằng cách liên tục di chuyển đến trạng thái lân cận tốt hơn, dựa trên đánh giá bằng hàm heuristic. Nó giống như người leo núi, luôn chọn bước đi lên cao hơn hiện tại.
 
@@ -244,7 +264,7 @@ Tóm lại, Simple Hill Climbing phù hợp với các bài toán nhỏ hoặc c
 
 ![SHC_gif](assets/Algorithms_Gif/9_SHC.gif)
 
-#### 4.3.2. **Steepest Ascent Hill Climbing** - Tìm kiếm bằng cách di chuyển đến vị trí tốt nhất,
+#### 4.3.2. Steepest Ascent Hill Climbing - Tìm kiếm bằng cách di chuyển đến vị trí tốt nhất,
 
 **Steepest Ascent Hill Climbing** là phiên bản cải tiến của Simple Hill Climbing. Thay vì chọn bất kỳ hàng xóm nào tốt hơn, thuật toán sẽ duyệt qua tất cả các trạng thái hàng xóm và chọn trạng thái tốt nhất (có heuristic thấp nhất) để di chuyển.
 
@@ -258,7 +278,7 @@ Tóm lại, Steepest Ascent Hill Climbing thường hiệu quả hơn phiên b�
 
 ![S-AHC_gif](assets/Algorithms_Gif/10_S-AHC.gif)
 
-#### 4.3.3. **Stochastic Hill Climbing** - Tìm kiếm bằng cách di chuyển đến vị trí tốt hơn với xác suất,
+#### 4.3.3. Stochastic Hill Climbing - Tìm kiếm bằng cách di chuyển đến vị trí tốt hơn với xác suất,
 
 **Stochastic Hill Climbing** là một biến thể của thuật toán leo đồi, trong đó thuật toán không chọn trạng thái tốt nhất, mà chọn ngẫu nhiên một trạng thái tốt hơn trong số các hàng xóm.
 
@@ -273,7 +293,7 @@ Tóm lại, Stochastic Hill Climbing là một phương pháp tìm kiếm nhẹ 
 
 ![StoHC_gif](assets/Algorithms_Gif/11_StoHC.gif)
 
-#### 4.3.4. **Simulated Annealing** - Tìm kiếm bằng cách di chuyển đến vị trí tốt hơn với xác suất giảm dần.
+#### 4.3.4. Simulated Annealing - Tìm kiếm bằng cách di chuyển đến vị trí tốt hơn với xác suất giảm dần,
 
 **Simulated Annealing** là một thuật toán tìm kiếm cục bộ mô phỏng quá trình nung nóng và làm nguội kim loại để đạt trạng thái ổn định. Thuật toán cho phép di chuyển tới trạng thái xấu hơn với xác suất giảm dần theo thời gian.
 
@@ -287,7 +307,7 @@ Tóm lại, Simulated Annealing là một giải pháp hiệu quả cho các bà
 
 ![SA_gif](assets/Algorithms_Gif/12_SA.gif)
 
-#### 4.3.5. **Genetic Algorithm**: Tìm kiếm bằng cách di chuyển đến vị trí tốt hơn thông qua quá trình chọn lọc và lai ghép.
+#### 4.3.5. Genetic Algorithm: Tìm kiếm bằng cách di chuyển đến vị trí tốt hơn thông qua quá trình chọn lọc và lai ghép.
 
 **Genetic Algorithm (GA)** là thuật toán tìm kiếm cục bộ dựa trên nguyên lý tiến hóa tự nhiên. Nó sử dụng các kỹ thuật như chọn lọc, lai ghép (crossover) và đột biến (mutation) để tạo ra thế hệ lời giải ngày càng tốt hơn.
 
@@ -309,11 +329,17 @@ Tóm lại, Genetic Algorithm là phương pháp mạnh mẽ cho các bài toán
 
 ![Gen_gif](assets/Algorithms_Gif/13_Gen_2.gif)
 
-#### 4.3.6. **Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm cục bộ:**
+#### Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm cục bộ:
 
 ![Compare_Local_Search](assets/Compares_Chart/Local_Search.png)
 
-#### 4.3.7. **Nhận xét chung về hiệu suất thuật toán tìm kiếm cục bộ:**
+#### Nhận xét chung về hiệu suất thuật toán tìm kiếm cục bộ:
+
+- Genetic Algorithm: Thời gian chậm, mở rộng nhiều node nhưng vẫn chưa đạt độ sâu tối ưu. Thích hợp cho bài toán phức tạp, nhưng cần tinh chỉnh tham số tốt hơn.
+
+- Simulated Annealing (SA): Rất nhanh, độ sâu lớn → nhưng thường không tìm được lời giải. Cần cải thiện các tham số để tối ưu thuật toán.
+
+- SHC, S-AHC, StoHC (Hill Climbing): Chạy cực nhanh, nhưng dễ rơi vào local optimum (vùng kẹt). Độ sâu nhỏ → không tìm được lời giải cho các map khó.
 
 ### 4.4. Searh Algorithms in Complex Environment
 
@@ -327,7 +353,7 @@ Trong các môi trường phức tạp, chẳng hạn như môi trường không
 
 Để giải quyết, chúng ta sử dụng các kỹ thuật mở rộng như:
 
-#### 4.4.1. **And-Or Graph Search Algorithm**
+#### 4.4.1. And-Or Graph Search Algorithm
 
 **And-Or Graph Search** là thuật toán mở rộng của tìm kiếm truyền thống, dùng để xử lý các bài toán có cấu trúc chia nhỏ mục tiêu (subgoals). Trong đồ thị AND-OR:
 
@@ -349,7 +375,7 @@ Tóm lại, And-Or Graph Search phù hợp cho các bài toán như lập kế h
 
 ![AndOr_gif](assets/Algorithms_Gif/14_And-Or.gif)
 
-#### 4.4.2. **Belief State Search Algorithms:**
+#### 4.4.2. Belief State Search Algorithms:
 
 Trong môi trường không chắc chắn, đầu vào không phải là một trạng thái đầy đủ, mà là một trạng thái niềm tin – chỉ biết một vài ô trong ma trận 8-Puzzle. Mục tiêu là sinh ra tất cả các trạng thái hợp lệ từ thông tin ban đầu và áp dụng thuật toán tìm kiếm để giải bài toán. Dưới đây là các biến thể của thuật toán tìm kiếm áp dụng cho belief state:
 
@@ -373,31 +399,45 @@ Trong môi trường không chắc chắn, đầu vào không phải là một t
 
 ![B-Beam_gif](assets/Algorithms_Gif/19_B-Beam.gif)
 
-#### 4.4.3. **Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm trong môi trường phức tạp:**
+#### Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm trong môi trường phức tạp:
 
 ![Compare_Complex_Search](assets/Compares_Chart/Complex_Search.png)
 
-#### 4.4.4. **Nhận xét chung về hiệu suất thuật toán tìm kiếm trong môi trường phức tạp**
+#### Nhận xét chung về hiệu suất thuật toán tìm kiếm trong môi trường phức tạp:
 
-### 4.5. **CSP Algorithms**
+- Belief-A\* và Belief-Greedy cho kết quả rất nhanh với thời gian chạy nhỏ, ít node được mở rộng, đồng thời vẫn đạt được độ sâu mong muốn.
 
-#### 4.5.1. **Backtracking Algorithm**
+- Belief-Beam cũng hoạt động ổn định với tốc độ nhanh, đặc biệt hiệu quả với các cấu hình trạng thái không đầy đủ.
+
+- Belief-IDS tiêu tốn thời gian và số lượng node mở rộng rất lớn, vì phải thử nhiều tầng lặp lại cho tất cả các trạng thái khả dĩ từ belief → không tối ưu cho môi trường lớn.
+
+- Belief-BFS có thời gian giải tương đối lâu do phải kiểm tra toàn bộ tổ hợp các trạng thái hoàn chỉnh sinh từ belief.
+
+### 4.5. CSP Algorithms
+
+#### 4.5.1. Backtracking Algorithm
 
 Giải bài toán bằng cách thử từng giá trị cho biến theo thứ tự, kiểm tra ràng buộc sau mỗi bước. Nếu phát hiện xung đột, thuật toán quay lui (backtrack) để thử giá trị khác.
 
 ![BackTrack_gif](assets/Algorithms_Gif/20_BackTrack.gif)
 
-### 4.5.2. **Forward Checking Algorithm**
+### 4.5.2. Forward Checking Algorithm
 
 Mở rộng thuật toán backtracking bằng cách, sau mỗi lần gán biến, loại bỏ các giá trị không hợp lệ khỏi miền giá trị của các biến còn lại. Điều này giúp phát hiện sớm mâu thuẫn và giảm đáng kể không gian tìm kiếm.
 
 ![ForCheck_gif](assets/Algorithms_Gif/21_ForCheck.gif)
 
-#### 4.5.3. **Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm trong môi trường ràng buộc:**
+#### Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm trong môi trường ràng buộc:
 
 ![Compare_CSP](assets/Compares_Chart/CSP_Search.png)
 
-#### 4.5.4. **Nhận xét chung về hiệu suất thuật toán tìm kiếm trong môi trường ràng buộc:**
+#### Nhận xét chung về hiệu suất thuật toán tìm kiếm trong môi trường ràng buộc:
+
+- Backtracking vẫn khả thi hơn khi áp dụng vào 8-Puzzle trong môi trường ràng buộc.
+
+- Forward Checking không phù hợp cho bài toán này vì chi phí tính toán bổ sung không mang lại lợi ích rõ ràng.
+
+Trong tương lai, nên kết hợp CSP + Heuristics để rút ngắn thời gian và giảm số node mở rộng.
 
 ### 4.6. Q-Learning (Reinforcement Learning)
 
@@ -419,7 +459,7 @@ Q-Learning học một hàm giá trị Q(state, action) – đại diện cho l�
 
 ---
 
-## 5. **Yêu cầu sử dụng chương trình**
+## 5. Yêu cầu sử dụng chương trình
 
 Để chạy được chương trình 8-Puzzle Solver trên máy của bạn, bạn cần chuẩn bị các yêu cầu sau:
 
@@ -429,16 +469,16 @@ Q-Learning học một hàm giá trị Q(state, action) – đại diện cho l�
 
 ---
 
-## 6. **Cách sử dụng chương trình 8 - Puzzle Solver**
+## 6. Cách sử dụng chương trình 8 - Puzzle Solver
 
-#### **1. Tải mã nguồn:** Clone dự án về máy bằng Git
+### 1. Tải mã nguồn: Clone dự án về máy bằng Git
 
 ```
 git clone https://github.com/House1904/Personal_Project_AI.git
 cd Personal_Project_AI
 ```
 
-#### **2. Cài đặt thư viện cần thiết**
+### 2. Cài đặt thư viện cần thiết
 
 Trước khi chạy chương trình, bạn cần cài đặt các thư viện sau:
 
@@ -448,13 +488,13 @@ pip install pygame matplotlib
 
 Một số thư viện khác như random, math, heapq, collections, copy, pickle... là mặc định có sẵn trong Python.
 
-#### **3. Chạy chương trình chính**
+### 3. Chạy chương trình chính
 
 ```
 python main.py
 ```
 
-#### **4. Nhập trạng thái ban đầu**
+### 4. Nhập trạng thái ban đầu
 
 **Nhập trạng thái đầu:** Tại ô nhập liệu bên dưới giao diện, bạn có thể nhập trạng thái bắt đầu của 8-puzzle.
 
@@ -466,7 +506,7 @@ python main.py
 
 Ví dụ hợp lệ: `265087431`
 
-Hoặc nếu bạn muốn dùng thuật toán Belief Search, hãy dùng ký tự - để biểu thị các ô chưa biết: ``123--45--`
+Hoặc nếu bạn muốn dùng thuật toán Belief Search, hãy dùng ký tự - để biểu thị các ô chưa biết: `123--45--`
 
 Sau khi nhập, nhấn `Enter` để áp dụng trạng thái mới.
 
@@ -478,7 +518,7 @@ Sau khi nhập, nhấn `Enter` để áp dụng trạng thái mới.
 
 - Belief State phải có ít nhất 1 dấu - và không vi phạm tính hợp lệ của trạng thái
 
-#### **5. Chọn và chạy thuật toán**
+### 5. Chọn và chạy thuật toán
 
 Chọn thuật toán bất kỳ trên giao diện, ví dụ:
 
@@ -492,7 +532,7 @@ Chọn thuật toán bất kỳ trên giao diện, ví dụ:
 
 - Q-Learning
 
-#### **6. Quan sát kết quả giải**
+### 6. Quan sát kết quả giải
 
 Kết quả thuật toán được hiển thị trực quan:
 
@@ -510,7 +550,7 @@ Kết quả thuật toán được hiển thị trực quan:
 
   - Tổng số bước đi (Steps)
 
-#### **7. Điều khiển animation**
+### 7. Điều khiển animation
 
 Bạn có thể điều hướng quá trình giải thông qua các nút:
 
@@ -526,7 +566,7 @@ Bạn có thể điều hướng quá trình giải thông qua các nút:
 
 - _Compare_: So sánh hiệu suất các thuật toán đã chạy bằng biểu đồ
 
-#### **8. So sánh thuật toán**
+### 8. So sánh thuật toán
 
 Sau khi thử nhiều thuật toán, nhấn Compare để hiển thị biểu đồ so sánh hiệu năng các thuật toán đã chạy:
 
@@ -536,7 +576,7 @@ Sau khi thử nhiều thuật toán, nhấn Compare để hiển thị biểu đ
 
 Dữ liệu được vẽ bằng `matplotlib`.
 
-#### **9. Ghi log kết quả**
+### 9. Ghi log kết quả
 
 Kết quả của mỗi lần chạy thuật toán sẽ được lưu vào file CSV algorithm_results_log.csv, bao gồm:
 
@@ -552,9 +592,9 @@ Kết quả của mỗi lần chạy thuật toán sẽ được lưu vào file 
 
 ---
 
-## 7. **Kết quả đạt được và hướng phát triển**
+## 7. Kết quả đạt được và hướng phát triển
 
-### 7.1. **Kết quả đạt được**
+### 7.1. Kết quả đạt được
 
 Sau quá trình xây dựng hệ thống giải bài toán 8-Puzzle bằng Python và thư viện PyGame, nhóm đã đạt được một số kết quả nổi bật như sau:
 
@@ -582,7 +622,7 @@ Sau quá trình xây dựng hệ thống giải bài toán 8-Puzzle bằng Pytho
 
 **Hiệu quả hoạt động tốt với đa số các bản đồ:** Animation chạy mượt mà, kiểm soát linh hoạt với các nút Play, Next, Previous, Stop, Reset.
 
-### 7.2. **Hướng phát triển**
+### 7.2. Hướng phát triển
 
 Để mở rộng và nâng cấp hệ thống trong tương lai, có thể triển khai thêm:
 
@@ -630,7 +670,7 @@ Sau quá trình xây dựng hệ thống giải bài toán 8-Puzzle bằng Pytho
 
 ---
 
-## 8. **Giấy phép và Bản quyền**
+## 8. Giấy phép và Bản quyền
 
 Dự án này được cấp phép theo giấy phép [MIT License](LICENSE).
 
@@ -638,7 +678,7 @@ Bạn có thể sử dụng, sửa đổi và phân phối phần mềm này cho
 
 ---
 
-## 9. **Các nguồn tham khảo**
+## 9. Các nguồn tham khảo
 
 [8-Puzzle Solver Web App - by AbdElRahman Osama](https://8-puzzle.streamlit.app/)
 
