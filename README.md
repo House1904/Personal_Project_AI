@@ -421,7 +421,7 @@ Giải bài toán bằng cách thử từng giá trị cho biến theo thứ t�
 
 ![BackTrack_gif](assets/Algorithm_Gifs/20_BackTrack.gif)
 
-### 4.5.2. Forward Checking Algorithm
+#### 4.5.2. Forward Checking Algorithm
 
 Mở rộng thuật toán backtracking bằng cách, sau mỗi lần gán biến, loại bỏ các giá trị không hợp lệ khỏi miền giá trị của các biến còn lại. Điều này giúp phát hiện sớm mâu thuẫn và giảm đáng kể không gian tìm kiếm.
 
