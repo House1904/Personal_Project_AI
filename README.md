@@ -134,7 +134,7 @@ Thuật toán trả về: đường đi từ start đến goal, thời gian ch�
 
 #### Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm không có thông tin:
 
-![Compare_Uninform_Search](assets/Compare_Charts/1.%20Uninform_Search.png)
+![Compare_Uninform_Search](assets/Compare_Charts/1_Uninform_Search.png)
 
 #### Nhận xét chung về hiệu suất thuật toán tìm kiếm không thông tin:
 
@@ -218,7 +218,7 @@ Tóm lại, Beam Search là sự cân bằng giữa hiệu quả và chi phí, p
 
 #### Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm có thông tin:
 
-![Compare_Inform_Search](assets/Compare_Charts/2.%20Inform_Search.png)
+![Compare_Inform_Search](assets/Compare_Charts/2_Inform_Search.png)
 
 #### Nhận xét chung về hiệu suất thuật toán tìm kiếm có thông tin:
 
@@ -331,7 +331,7 @@ Tóm lại, Genetic Algorithm là phương pháp mạnh mẽ cho các bài toán
 
 #### Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm cục bộ:
 
-![Compare_Local_Search](assets/Compare_Charts/3.%20Local_Search.png)
+![Compare_Local_Search](assets/Compare_Charts/3_Local_Search.png)
 
 #### Nhận xét chung về hiệu suất thuật toán tìm kiếm cục bộ:
 
@@ -401,7 +401,7 @@ Trong môi trường không chắc chắn, đầu vào không phải là một t
 
 #### Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm trong môi trường phức tạp:
 
-![Compare_Complex_Search](assets/Compare_Charts/4.%20Complex_Search.png)
+![Compare_Complex_Search](assets/Compare_Charts/4_Complex_Search.png)
 
 #### Nhận xét chung về hiệu suất thuật toán tìm kiếm trong môi trường phức tạp:
 
@@ -429,7 +429,7 @@ Mở rộng thuật toán backtracking bằng cách, sau mỗi lần gán biến
 
 #### Biểu đồ cột so sánh hiệu suất các thuật toán tìm kiếm trong môi trường ràng buộc:
 
-![Compare_CSP](assets/Compare_Charts/5.%20CSP_Search.png)
+![Compare_CSP](assets/Compare_Charts/5_CSP_Search.png)
 
 #### Nhận xét chung về hiệu suất thuật toán tìm kiếm trong môi trường ràng buộc:
 
